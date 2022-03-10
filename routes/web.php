@@ -19,13 +19,16 @@ Auth::routes();
 //     return view('welcome');
 // });
 //Route::get('/', [App\Http\Controllers\Auth\LoginController::class, 'login']);
+
 Route::get('/', [App\Http\Controllers\HomeController::class, 'index']);
+//Route::post('/', [App\Http\Controllers\HomeController::class, 'index']);
 
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+//Route::post('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 //Route::resource('wpp', App\Http\Controllers\WppconnectController::class);
-Route::post('wpp', [App\Http\Controllers\WppconnectController::class, 'index'])->name('wpp.index');
+Route::get('wpp', [App\Http\Controllers\WppconnectController::class, 'index'])->name('wpp.index');
 Route::post('wpp/getqrcode', [App\Http\Controllers\WppconnectController::class, 'getQrCode'])->name('wpp.getqrcode');
 Route::get('wpp/chat', [App\Http\Controllers\WppconnectController::class, 'chat'])->name('wpp.chat');
 Route::post('wpp/chatajax', [App\Http\Controllers\WppconnectController::class, 'getAllChatsAjax'])->name('wpp.chatajax');
