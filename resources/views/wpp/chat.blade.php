@@ -847,7 +847,7 @@
             // },
             success:function(data) {
                 //$("#msg").html(data.msg);
-                //console.log("getImgAjax:",serialize_id, data);
+                console.log("getImgAjax:",serialize_id, data);
                 if(data.status && data.status == "success"){
                     let imageDataURL = "data:"+mimetype+";base64,"+data.base64.replace(/"/g,"");
                     //$("#prev_img_" + serialize_id.split("@")[1].split("_")[1]).attr("src", imageDataURL);
@@ -870,6 +870,9 @@
                     }
                 }
                 
+            },
+            error: function(response){
+                console.log("getImgAjax (ajax error):",serialize_id, response.responseText);
             }
         });
     }
@@ -951,14 +954,14 @@
             },
             success:function(data) {
                 //$("#msg").html(data.msg);
-                console.log(data);
-                getMoreMsgs(userId,isGroup);
+                //console.log(data);
                 if(data.status == "success"){
                     var new_hash = data.chats_md5; 
                     if(currnt_chat_id != userId || currnet_chat_hash != new_hash){
-                        setMsgs(data.response.response, isGroup, userId, new_hash);
+                        setMsgs(data.response.response, isGroup, userId, new_hash, false);
                     }
                 }
+                getMoreMsgs(userId,isGroup);
                 
             }
         });
@@ -986,12 +989,14 @@
             success:function(data) {
                 //$("#msg").html(data.msg);
                 console.log("getMoreMsgs: ", data);
-                // if(data.status == "success"){
-                //     var new_hash = data.chats_md5; 
-                //     if(currnt_chat_id != userId || currnet_chat_hash != new_hash){
-                //         setMsgs(data.response.response, isGroup, userId, new_hash);
-                //     }
-                // }
+
+                if(data.status == "success"){
+                    //var new_hash = data.chats_md5; 
+                    var new_hash = "";// currnet_chat_hash;
+                    if(data.response.response !== false){
+                        setMsgs(data.response.response, isGroup, userId, new_hash, true);
+                    }
+                }
                 
             }
         });
@@ -1073,7 +1078,7 @@
     }
 
 
-    function setMsgs(msgs, isGroup, userId, new_hash){
+    function setMsgs(msgs, isGroup, userId, new_hash, isAarlierMsg){
         var writMsgArr;
         var isAppend = false;
         //console.log("currnt_chat_id:" , currnt_chat_id , "clicked_userId: " , userId)
@@ -1109,6 +1114,9 @@
         }
         msg_ary = msgs;
         //console.log("writMsgArr: ",writMsgArr);
+        if(isAarlierMsg && writMsgArr === undefined){
+            return false;
+        }
         var i = 0, len = writMsgArr.length;
         var msg_body_html = "";
         while (i < len) {
@@ -1117,9 +1125,15 @@
                 //show only chat
                 var msg_html = createMsgHtml(msg, isGroup);
                 //console.log(msg_html);
-                last_elem_id = msg_html[1];
+                if(!isAarlierMsg){
+                    last_elem_id = msg_html[1];
+                }
                 if(isAppend){
-                    $(".chat-container-region").append(msg_html[0])
+                    if(isAarlierMsg === true){
+                        $(".chat-container-region").prepend(msg_html[0])
+                    }else{
+                        $(".chat-container-region").append(msg_html[0])
+                    }
                 }else{
                     msg_body_html += msg_html[0];
                 }
@@ -1131,7 +1145,9 @@
         }
         setMsgsTail();
         //console.log("last_elem_id:" , last_elem_id)
-        scrollToElem(last_elem_id);
+        scrollToElem(last_elem_id,{
+            block: "end"
+        });
 
         // $(".msg-text-content").each(function(){
         //     $(this).html(twemoji.parse($(this).html()))

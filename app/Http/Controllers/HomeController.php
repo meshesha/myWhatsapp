@@ -30,6 +30,7 @@ class HomeController extends Controller
             return redirect()->route('wpp.index');
         }
         
+        
         session(['token' => $user_token]);
         session(['session' => $user_session]);
 

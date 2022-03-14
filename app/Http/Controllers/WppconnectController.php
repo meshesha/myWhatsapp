@@ -38,7 +38,7 @@ class WppconnectController extends Controller
         $user = auth()->user();
         
         if((!session('token') && !session('session')) || ($user->wpp_token == "")){
-            $this->session = md5($user->email);
+            $this->session = md5(uniqid($user->email));
             Wppconnect::make($this->url);
             $response = Wppconnect::to('/api/'.$this->session.'/'.$this->key.'/generate-token')->asJson()->post();
             $response = json_decode($response->getBody()->getContents(),true);
@@ -451,7 +451,6 @@ class WppconnectController extends Controller
     public function getMessageById($id)
     {
         //id =? true_120363020803854156@g.us_0BBFBE9C87651496021EAA6782EA08E4
-        //dd($id);
         $response = "";
         $url = $this->url;
         $session = session('session');
@@ -469,7 +468,7 @@ class WppconnectController extends Controller
             $response = $response->getBody()->getContents();//json_decode($response->getBody(),true);
         }
 
-        //dd($response);
+       // dd($response);
         return response()->json(array(
             'base64'=> $response,
             'status' => ($response != "")?"success":"fail"
