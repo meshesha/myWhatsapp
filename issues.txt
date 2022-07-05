@@ -1,0 +1,12 @@
+# wppconnect-server: Stuck at initializing
+    - install Chrome on a server:
+    (https://askubuntu.com/questions/245041/how-do-i-install-chrome-on-a-server)
+    > wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add - 
+    > sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
+    > sudo apt-get update
+    > sudo apt-get install google-chrome-stable
+    > sudo apt --fix-broken install
+    > google-chrome --version
+
+
+    Client error: `GET http://localhost:33333/api/6de08941d2b5ae163835624ff64b2913/load-earlier-messages/972506298128@c.us?isGroup=false` resulted in a `404 Not Found` response:<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Error</title></head><body><pre>Cannot GET /api/ (truncated...)

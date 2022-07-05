@@ -1,108 +1,5 @@
 @extends('layouts.main')
 
-@section('my_profile_img')
-    @if($myProfileImg != "")
-        <img src="{{ $myProfileImg }}"
-            id = "my_profile_image"
-            alt="" draggable="false" class="user-real-img user-real-img-opcty-1 vsblty-vsbl" style="visibility: visible;">
-    @endif
-@endsection
-
-@section('users_list')
-<div aria-label="Chat list"  class="users-group-list-container users-group-list-container-mrg" role="grid"
-    aria-rowcount="{{count($allChats)}}" style="height: 216px;">
-    <input type="hidden" id="chat-data-hash" value="{{$chats_md5}}" />
-    <div class="users-group-list-item"
-                style="z-index: 0; transition: none 0s ease 0s; height: 72px; transform: translateY(0px);">
-
-    @if(count($allChats) > 0)
-        @foreach($allChats as $chat)
-            <!-- user/groups item 1-->
-            <div tabindex="0" aria-selected="true" role="row">
-                <div data-testid="cell-frame-container"
-                    id = "user_{{$chat['id']['user']}}"
-                    data-userid="{{$chat['id']['user']}}"
-                    data-isgroup="{{($chat['isGroup'])?'yes':'no'}}" 
-                    data-userserialized="{{$chat['id']['_serialized']}}"
-                    
-                    class="users-group-cell-frame cell-frame">
-                    <div class="users-group-img-wrapper">
-                        <div class="users-group-img-container">
-                            <div class="avater-img-container"
-                                style="height: 49px; width: 49px;">
-                                <div class="default-avater-img-container">
-                                    <span data-testid="default-group"
-                                        data-icon="default-group" class="">
-                                        <svg width="212" height="212"
-                                            viewBox="0 0 212 212" fill="none" class="">
-                                            <path class="background"
-                                                d="M105.946.25C164.318.25 211.64 47.596 211.64 106s-47.322 105.75-105.695 105.75C47.571 211.75.25 164.404.25 106S47.571.25 105.946.25z"
-                                                fill="#DFE5E7">
-                                            </path>
-                                            <path class="primary" fill-rule="evenodd"
-                                                clip-rule="evenodd"
-                                                d="M102.282 77.286c0 10.671-8.425 19.285-18.94 19.285s-19.003-8.614-19.003-19.285C64.339 66.614 72.827 58 83.342 58s18.94 8.614 18.94 19.286zm48.068 2.857c0 9.802-7.738 17.714-17.396 17.714-9.658 0-17.454-7.912-17.454-17.714s7.796-17.715 17.454-17.715c9.658 0 17.396 7.913 17.396 17.715zm-67.01 29.285c-14.759 0-44.34 7.522-44.34 22.5v11.786c0 3.536 2.85 4.286 6.334 4.286h76.012c3.484 0 6.334-.75 6.334-4.286v-11.786c0-14.978-29.58-22.5-44.34-22.5zm43.464 1.425c.903.018 1.681.033 2.196.033 14.759 0 45 6.064 45 21.043v9.642c0 3.536-2.85 6.429-6.334 6.429h-32.812c.697-1.993 1.141-4.179 1.141-6.429l-.245-10.5c0-9.561-5.614-13.213-11.588-17.1-1.39-.904-2.799-1.821-4.162-2.828a.843.843 0 0 1-.059-.073.594.594 0 0 0-.194-.184c1.596-.139 4.738-.078 7.057-.033z">
-                                            </path>
-                                        </svg>
-                                    </span>
-                                </div>
-                                @if($chat['contact']['profilePicThumbObj']['eurl'] != '')
-                                <img
-                                    id = "user_img_{{$chat['id']['user']}}" 
-                                    src="{{$chat['contact']['profilePicThumbObj']['eurl']}}"
-                                    alt="" draggable="false" class="user-real-img user-real-img-opcty-1 vsblty-vsbl"
-                                    style="visibility: visible;">
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                    <!-- user/groups name status -->
-                    <div class="users-group-name-wrapper">
-                        <div role="gridcell" aria-colindex="2"
-                            class="users-group-name-time-grid">
-                            <div class="users-group-name-content">
-                                <span dir="auto" id="user_name_{{$chat['id']['user']}}" title="{{$chat['contact']['formattedName']}}"
-                                    class="user-name-txt">{{$chat['contact']['formattedName']}}
-                                </span>
-                            </div>
-                            <div class="users-group-counter-content"><!--yesterday--></div>
-                        </div>
-
-                        <div class="users-group-second-grid">
-                            <div class="users-group-new-msg-txt">
-                                <!-- <span class="Hy9nV" title="‪Ffff‬">
-                                    <span dir="auto" class="dsply-inlyn-blok vsblty-vsbl">אמיר</span>
-                                    <span>:&nbsp;</span>
-                                    <span dir="ltr"
-                                        class="user-name-txt">
-                                        Ffff
-                                    </span>
-                                </span> -->
-                            </div>
-                            <div role="gridcell" aria-colindex="1"
-                                class="users-group-counter-content">
-                                <span>
-                                    @if($chat['unreadCount'] > 0)
-                                    <div class="users-group-unread-msg-counter"
-                                        style="transform: scaleX(1) scaleY(1); opacity: 1;">
-                                        <span class="unread-msg-counter"
-                                            id = "unread_msg_{{$chat['id']['user']}}">{{$chat['unreadCount']}}</span>
-                                    </div>
-                                    @endif
-                                </span>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-        @endforeach
-    @endif
-    </div>
-</div>
-@endsection
-
-
 @section('chat_items')
 <div tabindex="-1" class="chat-container-region" data-tab="8" role="region">
     <!-- chat-items -->
@@ -139,10 +36,10 @@
     var currnt_chat_id = "";
     var is_current_group = "no";
     var currnet_chat_hash = "";
-    var all_chat_hash = "{!! $chats_md5 !!}";
-    var intervalusersId;
+    //var all_chat_hash = "{!! $chats_md5 !!}";
+    //var intervalusersId;
     var chat_replat_msg_serializedid = "";
-    sessionStorage.setItem("is_all_user_check", "true");
+    //sessionStorage.setItem("is_all_user_check", "true");
     var msg_ary = [];
     var intervalId;
     var last_elem_id = "";
@@ -182,7 +79,7 @@
             $(".message-out[data-id='" + dataId +"'] .msg-text-read-status span").removeClass("msg-text-read-color");
         */
         
-        setAllChatTimer();
+        //setAllChatTimer();
 
         $(".users-group-cell-frame").on("click",function(){
             var userId = $(this).attr("data-userid");
@@ -921,22 +818,22 @@
     }
 
 
-    function setAllChatTimer(){
+    // function setAllChatTimer(){
         
-        if(intervalusersId !== undefined){
-            clearInterval(intervalusersId);
-        }
-        getAllChats();
-        intervalusersId = setInterval(function(){
-            getAllChats();
+    //     if(intervalusersId !== undefined){
+    //         clearInterval(intervalusersId);
+    //     }
+    //     getAllChats();
+    //     intervalusersId = setInterval(function(){
+    //         getAllChats();
 
-            let is_check_users = sessionStorage.getItem("is_all_user_check");
-            //console.log("is_check_users:", is_check_users)
-            if(is_check_users == "false"){
-                clearInterval(intervalusersId);
-            }
-        },3000);
-    }
+    //         let is_check_users = sessionStorage.getItem("is_all_user_check");
+    //         //console.log("is_check_users:", is_check_users)
+    //         if(is_check_users == "false"){
+    //             clearInterval(intervalusersId);
+    //         }
+    //     },3000);
+    // }
     function getMessages(userId, isGroup) {
         //console.log(userId)
         $.ajaxSetup({
@@ -972,7 +869,8 @@
         //setLoadingMessages(true);
         // let userId = currnt_chat_id;
         // let isGroup = is_current_group;
-        console.log("getMoreMsgs: userId", userId , ",isGroup:" , isGroup);
+        //userId = userId.substr(0, userId.indexOf("@"));
+        console.log("getMoreMsgs: userId ", userId , ",isGroup:" , isGroup);
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -1003,79 +901,80 @@
 
     }
 
-    //user list and new msg count
-    function getAllChats() {
-        //console.log("old hash", all_chat_hash)
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
+    // //user list and new msg count
+    // function getAllChats() {
+    //     //console.log("old hash", all_chat_hash)
+    //     $.ajaxSetup({
+    //         headers: {
+    //             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    //         }
+    //     });
 
-        $.ajax({
-            type:'POST',
-            url:'/wpp/chatajax',
-            // data: {
-            //     user_id : userId,
-            //     is_group: isGroup
-            // },
-            success:function(data) {
-                //console.log("all chats:" , data);
-                if(data.conn_status && data.conn_status.message == "Connected"){
+    //     $.ajax({
+    //         type:'POST',
+    //         url:'/wpp/chatajax',
+    //         // data: {
+    //         //     user_id : userId,
+    //         //     is_group: isGroup
+    //         // },
+    //         success:function(data) {
+    //             //console.log("all chats:" , data);
+    //             if(data.conn_status && data.conn_status.message == "Connected"){
 
-                    //console.log("new hash", data.chats_md5)
-                    if(data.response.status == "success" && data.chats_md5 != all_chat_hash){
-                        all_chat_hash = data.chats_md5; 
-                        setUsers(data.response.response);
-                    }
-                }
+    //                 //console.log("new hash", data.chats_md5)
+    //                 if(data.response.status == "success" && data.chats_md5 != all_chat_hash){
+    //                     all_chat_hash = data.chats_md5; 
+    //                     setUsers(data.response.response);
+    //                     //Livewire listner hear to update chat user list - TODO
+    //                 }
+    //             }
                 
-            },
-            error: function(response){
-                console.log(response);
-            }
-        });
-    }
+    //         },
+    //         error: function(response){
+    //             console.log(response);
+    //         }
+    //     });
+    // }
 
-    function setUsers(chatUsersAry){
-        console.log("chatUsersAry" , chatUsersAry)
-        if(chatUsersAry.length && chatUsersAry.length > 0){ 
-            chatUsersAry.forEach(function(usr){
-                let user_Id = usr.id.user;
-                //console.log("user dom: " , $("#user_" + user_Id))
-                if($("#user_" + user_Id).length > 0){
-                    //check user name
-                    let userName = $("#user_name_" + user_Id).html();
-                    if(userName != usr.contact.formattedName){
-                        $("#user_name_" + user_Id).html(usr.contact.formattedName);
-                        $("#user_name_" + user_Id).attr("title", usr.contact.formattedName)
-                    }
-                    //check user image
-                    if($("#user_img_" + user_Id).length > 0){
-                        let userImg = $("#user_img_" + user_Id).attr("src");
-                        if(userImg != usr.contact.profilePicThumbObj.eurl){
-                            $("#user_img_" + user_Id).attr("src", usr.contact.profilePicThumbObj.eurl)
-                        }
-                    }else{
-                        //add imgae - TODO
-                    }
-                    //check user unread
-                    let unread_count = $("#unread_msg_" + user_Id).html();
-                    if(unread_count != usr.unreadCount){
-                        //Add sound new msg - TODO
-                        $("#unread_msg_" + user_Id).html(usr.unreadCount)
-                    }
+    // function setUsers(chatUsersAry){
+    //     console.log("chatUsersAry" , chatUsersAry)
+    //     if(chatUsersAry.length && chatUsersAry.length > 0){ 
+    //         chatUsersAry.forEach(function(usr){
+    //             let user_Id = usr.id.user;
+    //             //console.log("user dom: " , $("#user_" + user_Id))
+    //             if($("#user_" + user_Id).length > 0){
+    //                 //check user name
+    //                 let userName = $("#user_name_" + user_Id).html();
+    //                 if(userName != usr.contact.formattedName){
+    //                     $("#user_name_" + user_Id).html(usr.contact.formattedName);
+    //                     $("#user_name_" + user_Id).attr("title", usr.contact.formattedName)
+    //                 }
+    //                 //check user image
+    //                 if($("#user_img_" + user_Id).length > 0){
+    //                     let userImg = $("#user_img_" + user_Id).attr("src");
+    //                     if(userImg != usr.contact.profilePicThumbObj.eurl){
+    //                         $("#user_img_" + user_Id).attr("src", usr.contact.profilePicThumbObj.eurl)
+    //                     }
+    //                 }else{
+    //                     //add imgae - TODO
+    //                 }
+    //                 //check user unread
+    //                 let unread_count = $("#unread_msg_" + user_Id).html();
+    //                 if(unread_count != usr.unreadCount){
+    //                     //Add sound new msg - TODO
+    //                     $("#unread_msg_" + user_Id).html(usr.unreadCount)
+    //                 }
 
-                }else{
-                    addNewUser(usr);
-                }
-            })
-        }
-    }
+    //             }else{
+    //                 addNewUser(usr);
+    //             }
+    //         })
+    //     }
+    // }
 
-    function addNewUser(user){
-        console.log("add(append) new user - TODO" , user)
-    }
+    // function addNewUser(user){
+    //     console.log("add(append) new user - TODO" , user)
+    // }
 
 
     function setMsgs(msgs, isGroup, userId, new_hash, isAarlierMsg){

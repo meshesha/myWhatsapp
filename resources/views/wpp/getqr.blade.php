@@ -90,6 +90,6 @@
         getQrCode();
         setInterval(function () {
             getQrCode();
-        }, 3000);
+        }, 5000);
 </script>
 @endsection
