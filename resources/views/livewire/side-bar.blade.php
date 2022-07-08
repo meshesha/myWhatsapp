@@ -131,12 +131,13 @@
                             @foreach($allChats as $chat)
                                 <!-- user/groups item 1-->
                                 <div tabindex="0" aria-selected="true" role="row">
+                                    <!-- wire:click="getAllMessages('{{$chat['id']['_serialized']}}', '{{($chat['isGroup'])?'yes':'no'}}')" -->
                                     <div data-testid="cell-frame-container"
                                         id = "user_{{$chat['id']['user']}}"
                                         data-userid="{{$chat['id']['user']}}"
                                         data-isgroup="{{($chat['isGroup'])?'yes':'no'}}" 
                                         data-userserialized="{{$chat['id']['_serialized']}}"
-                                        
+                                        wire:click="getAllMessages('{{$chat['id']['_serialized']}}', '{{($chat['isGroup'])?'yes':'no'}}')"
                                         class="users-group-cell-frame cell-frame">
                                         <div class="users-group-img-wrapper">
                                             <div class="users-group-img-container">

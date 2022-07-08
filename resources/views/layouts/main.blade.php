@@ -158,9 +158,10 @@
                                 <div class="chat-container" tabindex="0">
                                     <div class="chat-container-spacer"></div>
 
-                                    @yield('chat_items')
-
-                                    <div hidden="" style="display: none;"></div>
+                                    <!-- yield('chat_items') -->
+                                    @livewire('msg-items')
+                                    
+                                    <div style="display: none;" ></div>
                                 </div>
                             </div>
                         </div>

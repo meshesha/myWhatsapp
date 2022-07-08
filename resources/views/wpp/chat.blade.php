@@ -80,41 +80,41 @@
         */
         
         //setAllChatTimer();
+        
+        // $(".users-group-cell-frame").on("click",function(){
+        //     //console.time("load_msgs")
+        //     var userId = $(this).attr("data-userid");
+        //     var userSrializeId = $(this).attr("data-userserialized");
+        //     var isGroup = $(this).attr("data-isgroup");
+        //     var userName = $(this).find(".user-name-txt").text();
+        //     var userImg = $(this).find(".user-real-img").attr("src");
+        //     is_current_group = isGroup;
+            
+        //     if(userImg == "" || userImg === undefined || userImg == null){
+        //         if($(".main-head-img-wrapper .avater-img-container img").length > 0){
+        //             $(".main-head-img-wrapper .avater-img-container img").remove();
+        //         }
+        //     }else{
+        //         if($(".main-head-img-wrapper .avater-img-container img").length > 0){
+        //             $(".main-head-img-wrapper .avater-img-container img").attr("src", userImg);
+        //         }else{
+        //             $("<img>",{
+        //                 src : userImg,
+        //                 draggable: false,
+        //                 class: "user-real-img user-real-img-opcty-1 vsblty-vsbl"
+        //             }).appendTo(".main-head-img-wrapper .avater-img-container");
+        //         }
+        //     }
+        //     //main-head-user-name
+        //     $(".main-head-user-name").html("<span class='user-name-txt'>" + userName + "</span>");
 
-        $(".users-group-cell-frame").on("click",function(){
-            var userId = $(this).attr("data-userid");
-            var userSrializeId = $(this).attr("data-userserialized");
-            var isGroup = $(this).attr("data-isgroup");
-            var userName = $(this).find(".user-name-txt").text();
-            var userImg = $(this).find(".user-real-img").attr("src");
-            is_current_group = isGroup;
-            //console.log("users-group-cell-frame: ", userSrializeId, isGroup)
-            //avater-img-container
-            if(userImg == "" || userImg === undefined || userImg == null){
-                if($(".main-head-img-wrapper .avater-img-container img").length > 0){
-                    $(".main-head-img-wrapper .avater-img-container img").remove();
-                }
-            }else{
-                if($(".main-head-img-wrapper .avater-img-container img").length > 0){
-                    $(".main-head-img-wrapper .avater-img-container img").attr("src", userImg);
-                }else{
-                    $("<img>",{
-                        src : userImg,
-                        draggable: false,
-                        class: "user-real-img user-real-img-opcty-1 vsblty-vsbl"
-                    }).appendTo(".main-head-img-wrapper .avater-img-container");
-                }
-            }
-            //main-head-user-name
-            $(".main-head-user-name").html("<span class='user-name-txt'>" + userName + "</span>");
-
-            //get messages
-            //getMessages(userSrializeId, isGroup);
-            setTimer(userSrializeId, isGroup);
-            $(".main-text-typing-area").show();
-            $("#main_msg_textbox").html("");
-        });
-
+        //     //get messages
+        //     //getMessages(userSrializeId, isGroup);
+        //     setTimer(userSrializeId, isGroup);
+        //     $(".main-text-typing-area").show();
+        //     $("#main_msg_textbox").html("");
+        // });
+        
 
 
         //$(".msg-text-write-area .textbox-input").on("input", function(e){
@@ -167,17 +167,17 @@
             //console.log("heigth: ", $(this).scrollTop() , this.scrollHeight - $(this).height())
             var crrPos =  $(this).scrollTop();
             var botPos = this.scrollHeight - $(this).height();
-            if(crrPos != botPos){
-                //$(".page_down").css("top", (botPos) + "px" );
-                $(".page_down").show();
-            }else{
+            //console.log("chat-container scroll: ", (botPos - crrPos))
+            if((botPos - crrPos) < 8){
                 $(".page_down").hide();
+            }else{
+                $(".page_down").show();
             }
         })
 
 
         $("#page_down_btn").on("click", function(){
-            scrollToElem(last_elem_id);
+            scrollToElem("scroll_down_pos");
         });
 
         $(".close_replay_msg_btn_btn").on("click", function(){
@@ -784,7 +784,7 @@
         setSeenMsgs(userSrializeId);
         intervalId = setInterval(function(user_id, is_group){
             //console.log(user_id, is_group)
-            //getMessages(user_id, is_group);
+            getMessages(user_id, is_group);
         },1000, userSrializeId, isGroup);
 
         //$(".msg-text-content").emojioneArea()
@@ -858,7 +858,7 @@
                         setMsgs(data.response.response, isGroup, userId, new_hash, false);
                     }
                 }
-                getMoreMsgs(userId,isGroup);
+                //getMoreMsgs(userId,isGroup);
                 
             }
         });
@@ -870,7 +870,8 @@
         // let userId = currnt_chat_id;
         // let isGroup = is_current_group;
         //userId = userId.substr(0, userId.indexOf("@"));
-        console.log("getMoreMsgs: userId ", userId , ",isGroup:" , isGroup);
+        //console.log("getMoreMsgs: userId ", userId , ",isGroup:" , isGroup);
+        
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -886,7 +887,7 @@
             },
             success:function(data) {
                 //$("#msg").html(data.msg);
-                console.log("getMoreMsgs: ", data);
+                //console.log("getMoreMsgs: ", data);
 
                 if(data.status == "success"){
                     //var new_hash = data.chats_md5; 
@@ -896,8 +897,12 @@
                     }
                 }
                 
+            },
+            error: function(response){
+                console.log("earlierchatmsg: ", response)
             }
         });
+
 
     }
 
@@ -1043,6 +1048,7 @@
             $(".chat-container-region").html(msg_body_html)
         }
         setMsgsTail();
+        //console.timeEnd("load_msgs")
         //console.log("last_elem_id:" , last_elem_id)
         scrollToElem(last_elem_id,{
             block: "end"
@@ -1306,6 +1312,7 @@
     }
 
     function scrollToElem(elem_id, option){
+        console.log("scrollToElem: ", elem_id)
         let defaultOptions = {
             behavior: "smooth",
             block: "end"

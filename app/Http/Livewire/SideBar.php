@@ -95,8 +95,12 @@ class SideBar extends Component
         $this->getContants();
         $this->getMyProfile();
 
-        //$this->emitUp('checkChatUsrsHash');
-
         return view('livewire.side-bar');
+    }
+
+    public function getAllMessages($userId, $is_group)
+    {
+       
+        $this->emit('get_all_Messages',$userId, $is_group);
     }
 }

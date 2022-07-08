@@ -10,3 +10,17 @@
 
 
     Client error: `GET http://localhost:33333/api/6de08941d2b5ae163835624ff64b2913/load-earlier-messages/972506298128@c.us?isGroup=false` resulted in a `404 Not Found` response:<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Error</title></head><body><pre>Cannot GET /api/ (truncated...)
+
+
+    php artisan config:clear
+    php artisan config:cache
+    php artisan route:clear
+    php artisan route:cache
+    php artisan view:clear
+    php artisan view:cache
+    php artisan event:clear
+    php artisan event:cache
+    php artisan cache:clear
+    php artisan optimize:clear
+
+    
