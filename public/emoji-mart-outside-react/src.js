@@ -1,8 +1,9 @@
+
 const NimblePicker = require('emoji-mart/dist/components/picker/nimble-picker').default
 const React = require('react')
 const { define } = require('remount/es6')
 
-async function main() {
+async function emojiMartPeaker() {
   //const data = await (await fetch('emoji-mart-outside-react-master/node_modules/emoji-mart/data/facebook.json')).json() //all.json
   const data = await (await fetch('/emoji-mart-outside-react/emoji-mart/data/facebook.json')).json() //all.json //../emoji-mart/data/facebook.json
   const Picker = props => (React.createElement(NimblePicker, {
@@ -62,7 +63,10 @@ async function main() {
         myField.value += myValue;
         myField.focus()
       }
+      document.getElementById('main_msg_textbox').dispatchEvent(new Event('input'))
+
     },
+    
     title: 'Emoji',
     showPreview: true,
     theme: 'dark',
@@ -70,7 +74,10 @@ async function main() {
     ...props
   }));
   //Picker.width = '100%';
-  define({ 'emoji-picker': Picker });
+  if (customElements.get('emoji-picker') === undefined){
+    define({ 'emoji-picker': Picker });
+  }
+    
 
   //const picker = document.createElement('emoji-picker')
   // document.body.appendChild(picker)
@@ -214,12 +221,14 @@ async function main() {
       //'smiley-close-btn'
       document.querySelector('.wasap_emoji').style.display = 'none';
       document.querySelector('.smiley-close-btn').style.display = 'none';
+      document.querySelector('.emojis-btn').style.display = 'block';
       //this.lib('.wasap_emoji').remove();
     },
     showPicker: (e) => {
       e.preventDefault();
       document.querySelector('.wasap_emoji').style.display = 'block';
       document.querySelector('.smiley-close-btn').style.display = 'block';
+      document.querySelector('.emojis-btn').style.display = 'none';
 
     },
   }
@@ -247,6 +256,4 @@ async function main() {
   })()
 
 }
-
-main().catch(err => console.error(err))
-
+emojiMartPeaker().catch(err => console.error(err))

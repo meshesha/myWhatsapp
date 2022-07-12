@@ -172,18 +172,19 @@ class Wpp //extends Component
         $token = session('token');
         
         $to = "/api/$session/load-earlier-messages/$userId?isGroup=".$isgroup ;
-        try{
+        
             if($token && $session && session('init')){
-                Wppconnect::make(Wpp::$url);
-                $response = Wppconnect::to($to)->withHeaders([
-                    'Authorization' => 'Bearer '.$token 
-                ])->asJson()->get();
+                Wppconnect::make(Wpp::$url , false);
+                try{
+                    $response = Wppconnect::to($to)->withHeaders([
+                        'Authorization' => 'Bearer '.$token 
+                    ])->asJson()->get();    
+                }catch(Exception $e){
+
+                }
 
                 //$response = json_decode($response->getBody()->getContents(),true);
             }
-        }catch(Exception $e){
-
-        }
         if($response != "" && $response != null){
             $response = json_decode($response->getBody()->getContents(),true);
         }
@@ -243,7 +244,7 @@ class Wpp //extends Component
         $to = "/api/$session/send-seen";
         if($token && $session && session('init')){
             try{
-                Wppconnect::make(Wpp::$url);
+                Wppconnect::make(Wpp::$url, false);
                 $response = Wppconnect::to($to)->withBody([
                     "phone" => $userId 
                 ])->withHeaders([

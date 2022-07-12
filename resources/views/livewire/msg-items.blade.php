@@ -1,4 +1,4 @@
-<div tabindex="-1" class="chat-container-region" data-tab="8" role="region">
+<div tabindex="-1" class="chat-container-region" data-tab="8" role="region"  wire:poll.1s="checkMsg">
     <!-- chat-items -->
     {{--dump($msg_items)--}}
     @if($msg_items && $msg_items != null && $msg_items != "")
@@ -18,7 +18,8 @@
                     $tail_data = 'tail-in';
                 @endphp
             @endif
-            <div tabindex="-1" class="chat-item focusable-list-item {{$in_or_out}} " data-id="{{$elem_id}}" id="{{$elem_id}}" data-serializedid="{{$elem_id}}">  
+            <div tabindex="-1" class="chat-item focusable-list-item {{$in_or_out}} " data-id="{{$elem_id}}" id="{{$elem_id}}" data-serializedid="{{$elem_id}}">
+                <!-- <input type="hidden" class="chat-id" value="{{$elem_id}}" > -->
                 <!-- <span></span>  //? -->
                 <div class="chat-item-content chat-item-wide chat-item-shape"> 
                     @if(!isset($msg['quotedMsg']))
@@ -124,47 +125,54 @@
         @endforeach
         <div  id="scroll_down_pos"></div>
     @endif
-    <script>
+    <script> 
+        function reload_js(src) {
+            $('script[src="' + src + '"]').remove();
+            $('<script>').attr('src', src).appendTo('head');
+        }
+
+        function setMsgsTail(){
+            var svg_tail_out_ltr = '<svg viewBox="0 0 8 13" width="8" height="13"><path opacity=".13" d="M5.188 1H0v11.193l6.467-8.625C7.526 2.156 6.958 1 5.188 1z"></path><path fill="currentColor" d="M5.188 0H0v11.193l6.467-8.625C7.526 1.156 6.958 0 5.188 0z"></path></svg>';
+            var svg_tail_out_rtl = '<svg viewBox="0 0 8 13" width="8" height="13"><path opacity=".13" fill="#0000000" d="M1.533 3.568L8 12.193V1H2.812C1.042 1 .474 2.156 1.533 3.568z" ></path><path fill="currentColor" d="M1.533 2.568L8 11.193V0H2.812C1.042 0 .474 1.156 1.533 2.568z"></path></svg>';
+            //var svg_tail_in_ltr =   '<svg viewBox="0 0 8 13" width="8" height="13"><path opacity=".13" fill="#0000000" d="M1.533 3.568L8 12.193V1H2.812C1.042 1 .474 2.156 1.533 3.568z"></path><path fill="currentColor" d="M1.533 2.568L8 11.193V0H2.812C1.042 0 .474 1.156 1.533 2.568z"></path></svg>';
+            //var svg_tail_in_rtl =   '<svg viewBox="0 0 8 13" width="8" height="13"><path opacity=".13" d="M5.188 1H0v11.193l6.467-8.625C7.526 2.156 6.958 1 5.188 1z"></path><path fill="currentColor" d="M5.188 0H0v11.193l6.467-8.625C7.526 1.156 6.958 0 5.188 0z"></path></svg >';
+
+            var doc_dir = $("html").attr("dir");
+            if (doc_dir == "rtl" || doc_dir == "RTL") {
+                $(".message-out .chat-item-content .chat-item-tail").html(svg_tail_out_rtl);
+                $(".message-in .chat-item-content .chat-item-tail").html(svg_tail_out_ltr);
+            } else {
+                $(".message-out .chat-item-content .chat-item-tail").html(svg_tail_out_ltr);
+                $(".message-in .chat-item-content .chat-item-tail").html(svg_tail_out_rtl);
+            }
+        }
+
         window.addEventListener('msgs-loaded', event => {
-            console.log('msg loaded with hash: ' + event.detail.hash);
-            setMsgsTail();
+            //console.log('msg loaded with hash: ' + event.detail.hash);
+
+            var user_id = event.detail.selected_user;
+            var is_group = event.detail.is_group;
+
+            //reload_js("{{url('emoji-mart-outside-react/dist/main.js')}}")
+            $("#slected_current_user_id").val(user_id);
+            //document.getElementById("slected_current_user_id").dispatchEvent(new Event('input'));
+            $("#slected_current_is_group").val(is_group);
+            //document.getElementById("slected_current_is_group").dispatchEvent(new Event('input'));
+
             $(".main-text-typing-area").show();
+
             scrollToElem("scroll_down_pos",{
                 block: "end"
             });
+            $("body").removeClass("loading");
         });
+        // window.addEventListener('check-msgs', event => {
+        //     var hash = event.detail.new_hash;
+        //     var user = event.detail.current_user;
+        //     var is_group = event.detail.is_group;
+        //     console.log('new_hash: ' + hash , "current_user: " + user, "is_group: " + is_group);
+            
+        // });
         
     </script>
 </div>
-
-
-@section('foot_script_side_bar')
-
-<script type="text/javascript">
-    // $(".chat-item").on("load", function(){
-    //     console.log("chat item loaded");
-    // });
-    
-    // function scrollToElem(elem_id, option){
-    //     console.log("scrollToElem: ", elem_id)
-    //     let defaultOptions = {
-    //         behavior: "smooth",
-    //         block: "end"
-    //     }
-
-    //     if(option !== null && option !== undefined){
-    //         defaultOptions = option;
-    //     }
-
-    //     if(elem_id != "" && elem_id !== null && elem_id !== undefined){
-    //         var element = document.getElementById(elem_id);
-    //         if(element  !== null )
-    //             element.scrollIntoView(defaultOptions); //, block: "end", inline: "nearest"
-    //         else
-    //             console.log(`elemnet with id ${elem_id}: no found`)
-    //     }
-
-    // }
-</script>
-
-@endsection

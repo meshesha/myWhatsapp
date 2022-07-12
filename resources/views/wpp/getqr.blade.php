@@ -21,7 +21,7 @@
 
 @section('head_style')
 <style>
-    .overlay{
+    /* .overlay{
         display: none;
         position: fixed;
         width: 100%;
@@ -34,62 +34,65 @@
     body.loading{
         overflow: hidden;   
     }
-    /* Make spinner image visible when body element has the loading class */
     body.loading .overlay{
         display: block;
-    }
+    } */
 </style>
 @endsection
 
 @section('foot_script')
-<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 <script type="text/javascript">
-        $(document).on({
-            ajaxStart: function(){
-                $("body").addClass("loading"); 
-            },
-            ajaxStop: function(){ 
-                $("body").removeClass("loading"); 
-            }    
+    var qrcodehash = "-1";
+    // $(document).on({
+    //     ajaxStart: function(){
+    //         $("body").addClass("loading"); 
+    //     },
+    //     ajaxStop: function(){ 
+    //         $("body").removeClass("loading"); 
+    //     }    
+    // });
+
+    getQrCode();
+    setInterval(function () {
+        getQrCode();
+    }, 1000);
+
+    function getQrCode() {
+
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
         });
-        function getQrCode() {
 
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
-            });
-
-            $.ajax({
-                type:'POST',
-                url:'/wpp/getqrcode',
-                // data:'_token = <?php echo csrf_token() ?>',
-                success:function(data) {
-                    //$("#msg").html(data.msg);
-                    //console.log(data);
-                    if(data != "" && data !== null){
-                        try{
-                            var jsonData = data.response;//JSON.parse(data)
-                            var data_status = jsonData.status;
-                            var qrcode = jsonData.qrcode;
-                            //console.log("conn_status: ", data.conn_status);
-                            if(data.conn_status && data.conn_status.status == true){
-                                window.location.href = "/home";
-                            }else{
-                                if(data_status == "QRCODE"){
-                                    $("#qrcode-container img").attr("src", qrcode)
-                                }
+        $.ajax({
+            type:'POST',
+            url:'/wpp/getqrcode',
+            // data:'_token = <?php echo csrf_token() ?>',
+            success:function(data) {
+                //$("#msg").html(data.msg);
+                //console.log(data);
+                if(data != "" && data !== null){
+                    try{
+                        var jsonData = data.response;//JSON.parse(data)
+                        var data_status = jsonData.status;
+                        var qrcode = jsonData.qrcode;
+                        var newcrcodehash = data.hash;
+                        //console.log("conn_status: ", data.conn_status);
+                        if(data.conn_status && data.conn_status.status == true){
+                            window.location.href = "/home";
+                        }else{
+                            if(data_status == "QRCODE" && qrcodehash != newcrcodehash){
+                                $("#qrcode-container img").attr("src", qrcode)
+                                qrcodehash = newcrcodehash;
                             }
-                        }catch(e){
-                            console.log("error parsing data: ", JSON.stringify(e));
                         }
+                    }catch(e){
+                        console.log("error parsing data: ", JSON.stringify(e));
                     }
                 }
-            });
-        }
-        getQrCode();
-        setInterval(function () {
-            getQrCode();
-        }, 5000);
+            }
+        });
+    }
 </script>
 @endsection

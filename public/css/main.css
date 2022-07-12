@@ -611,7 +611,7 @@ html[dir] .users-group-list-container-mrg {
 
 .users-group-list-container {
     position: relative;
-    overflow: hidden;
+    /* overflow: hidden; */
 }
 
 /* user/group item */
@@ -2988,5 +2988,5 @@ html[dir] .close_replay_msg_btn {
 
 
         .contact-list-swel {
-            height: 90vh;
+            height: 95vh;
           }

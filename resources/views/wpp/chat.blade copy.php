@@ -1,5 +1,12 @@
 @extends('layouts.main')
 
+@section('chat_items')
+<div tabindex="-1" class="chat-container-region" data-tab="8" role="region">
+    <!-- chat-items -->
+</div>
+@endsection
+
+
 @section('head_style')
 <style>
     .loadin-spinng{
@@ -29,6 +36,7 @@
     var currnt_chat_id = "";
     var is_current_group = "no";
     var currnet_chat_hash = "";
+    //var all_chat_hash = "{!! $chats_md5 !!}";
     //var intervalusersId;
     var chat_replat_msg_serializedid = "";
     //sessionStorage.setItem("is_all_user_check", "true");
@@ -355,20 +363,14 @@
         //console.log("users_contants", users_contants)
         var conent_html = getConentHtml(users_contants, title, true ,isCheckbox);
         
-        var slct_name;
-
+        
 
         Swal.fire({
             title: title,
             html: conent_html,
             heightAuto: false,
-            showConfirmButton: isCheckbox,
-            showCloseButton: true, 
-            showDenyButton: isCheckbox,
-            showCancelButton: false,
-            confirmButtonText: 'שלח הודעה',
-            denyButtonText: 'בטל',
-            allowOutsideClick: false,
+            showConfirmButton: false,
+            showCloseButton: true,
             customClass: {
                 popup: 'contact-list-swel'
             },
@@ -380,102 +382,10 @@
                 //console.timeEnd("usersContant");
 
                 $(".contact-item-wrapper-btn").on("click", function(){
-                    var self_ = $(this);
-                    var slct_user_id = self_.attr("data-userid");
-                    console.log("contact-item-wrapper-btn", slct_user_id);
-                    if(!isCheckbox){
-                        $(".users-group-cell-frame").each(function(i , userItem){
-                            var sidebar_user = $(userItem).attr("data-userid");
-                            //console.log("sidebar_user : ", sidebar_user)
-                            if(sidebar_user == slct_user_id){
-                                $(this).click();
-                                Swal.close();
-                                return;
-                            }
-                        });
-                        //not found => add to top
-                        var slct_name = self_.parent().find(".contact-user-name-txt").text()
-                        var slct_userserialized = self_.attr("data-userserialized");
-                        var slct_isuser = self_.attr("data-isuser");
-                        var slct_isgroup = (slct_isuser=="true")?"no":"yes";
-                        var slct_img =  self_.parent().find(".contact-user-img")[0];
-                        var slct_img_src = (slct_img === undefined)?"":$(slct_img).attr("src");
-                        console.log("slct_userserialized:", slct_userserialized , "slct_isgroup:", slct_isgroup);
-                        console.log("slcted_img:", slct_img_src);
-                        //var slct_html = createUserChatHtml(slct_name, slct_user_id, slct_userserialized, slct_isgroup, slct_img);
-                        //$(".users-group-list-item").prepend(slct_html);
-                        //$(".users-group-list-item").find("#user_" + slct_user_id).click();
-                                
-
-                        var user_id = event.detail.selected_user;
-                        var is_group = event.detail.is_group;
-
-                        $("#slected_current_user_id").val(slct_userserialized);
-                        $("#slected_current_is_group").val(slct_isgroup);
-                        $(".main-text-typing-area").show();
-
-                        if(slct_img_src == "" || slct_img_src === undefined || slct_img_src == null){
-                            if($(".main-head-img-wrapper .avater-img-container img").length > 0){
-                                $(".main-head-img-wrapper .avater-img-container img").remove();
-                            }
-                        }else{
-                            if($(".main-head-img-wrapper .avater-img-container img").length > 0){
-                                $(".main-head-img-wrapper .avater-img-container img").attr("src", userImg);
-                            }else{
-                                $("<img>",{
-                                    src : slct_img_src,
-                                    draggable: false,
-                                    class: "user-real-img user-real-img-opcty-1 vsblty-vsbl"
-                                }).appendTo(".main-head-img-wrapper .avater-img-container");
-                            }
-                        }
-                        
-                        //main-head-user-name
-                        $(".main-head-user-name").html("<span class='user-name-txt'>" + slct_name + "</span>");
-                        
-                        Swal.close();
-
-                    }else{
-                        var chebox_el = self_.parent().find(".contact-item-checkbox");
-                        var is_checked = chebox_el.is(":checked")
-                        if(is_checked){
-                            chebox_el.prop("checked",false);
-                            self_.parent().find(".contact-item-visual-checkbox-0-unchecked").show();
-                            self_.parent().find(".contact-item-visual-checkbox-0-checked").hide();
-                        }else{
-                            chebox_el.prop("checked",true);
-                            self_.parent().find(".contact-item-visual-checkbox-0-unchecked").hide();
-                            self_.parent().find(".contact-item-visual-checkbox-0-checked").show();
-                        }
-                    }
+                    console.log("contact-item-wrapper-btn", $(this));
                 });
-            },
-
-
-        }).then((result) => {
-            /* Read more about isConfirmed, isDenied below */
-            if (result.isConfirmed) {
-                Swal.fire({
-                    title: '<strong>HTML <u>example</u></strong>',
-                    icon: 'info',
-                    html:
-                        'You can use <b>bold text</b>, ' +
-                        '<a href="//sweetalert2.github.io">links</a> ' +
-                        'and other HTML tags',
-                    showCloseButton: true,
-                    showCancelButton: true,
-                    focusConfirm: false,
-                    confirmButtonText:
-                        '<i class="fa fa-thumbs-up"></i> Great!',
-                    confirmButtonAriaLabel: 'Thumbs up, great!',
-                    cancelButtonText:
-                        '<i class="fa fa-thumbs-down"></i>',
-                    cancelButtonAriaLabel: 'Thumbs down'
-                });
-            } else if (result.isDenied) {
-                //Swal.fire('Changes are not saved', '', 'info')
-                Swal.close();
             }
+
         });
     }
 
@@ -516,11 +426,13 @@
                                 </div> 
                                 
                                 <!-- checked -->
-                                <div style="display:none;" class="contact-item-visual-checkbox-0 contact-item-visual-checkbox-0-checked">
+                                <!-- 
+                                <div class="contact-item-visual-checkbox-0 contact-item-visual-checkbox-0-checked">
                                     <div
                                         class="contact-item-visual-checkbox-v contact-item-visual-checkbox-v-checked">
                                     </div>
                                 </div>
+                                -->
                             </div>
                         </div>`;
                 }
@@ -628,7 +540,6 @@
                         <div tabindex="-1" class="search-input-wrapper search-input-space">
                             <div title="תיבת טקסט להזנת החיפוש" role="textbox"
                                 class="search-textbox-input copyable-text selectable-text" contenteditable="true"
-                                oninput="searchChatUser(this)"
                                 data-tab="3" dir="rtl">
                             </div>
                         </div>
@@ -704,77 +615,6 @@
         });
     }
 
-
-    // function createUserChatHtml(slct_name, slct_user_id, slct_userserialized, slct_isgroup, slct_img){
-    //     var chtml = `
-    //     <div tabindex="0" aria-selected="true" role="row">
-    //         <div data-testid="cell-frame-container"
-    //             id = "user_${slct_user_id}"
-    //             data-userid="${slct_user_id}"
-    //             data-isgroup="${slct_isgroup}" 
-    //             data-userserialized="${slct_userserialized}"
-    //             wire:click="getAllMessages('${slct_userserialized}', '${slct_isgroup}','${slct_name}','${slct_img}')"
-    //             class="users-group-cell-frame cell-frame">
-    //             <div class="users-group-img-wrapper">
-    //                 <div class="users-group-img-container">
-    //                     <div class="avater-img-container"
-    //                         style="height: 49px; width: 49px;">
-    //                         <div class="default-avater-img-container">
-    //                             <span data-testid="default-group"
-    //                                 data-icon="default-group" class="">
-    //                                 <svg width="212" height="212"
-    //                                     viewBox="0 0 212 212" fill="none" class="">
-    //                                     <path class="background"
-    //                                         d="M105.946.25C164.318.25 211.64 47.596 211.64 106s-47.322 105.75-105.695 105.75C47.571 211.75.25 164.404.25 106S47.571.25 105.946.25z"
-    //                                         fill="#DFE5E7">
-    //                                     </path>
-    //                                     <path class="primary" fill-rule="evenodd"
-    //                                         clip-rule="evenodd"
-    //                                         d="M102.282 77.286c0 10.671-8.425 19.285-18.94 19.285s-19.003-8.614-19.003-19.285C64.339 66.614 72.827 58 83.342 58s18.94 8.614 18.94 19.286zm48.068 2.857c0 9.802-7.738 17.714-17.396 17.714-9.658 0-17.454-7.912-17.454-17.714s7.796-17.715 17.454-17.715c9.658 0 17.396 7.913 17.396 17.715zm-67.01 29.285c-14.759 0-44.34 7.522-44.34 22.5v11.786c0 3.536 2.85 4.286 6.334 4.286h76.012c3.484 0 6.334-.75 6.334-4.286v-11.786c0-14.978-29.58-22.5-44.34-22.5zm43.464 1.425c.903.018 1.681.033 2.196.033 14.759 0 45 6.064 45 21.043v9.642c0 3.536-2.85 6.429-6.334 6.429h-32.812c.697-1.993 1.141-4.179 1.141-6.429l-.245-10.5c0-9.561-5.614-13.213-11.588-17.1-1.39-.904-2.799-1.821-4.162-2.828a.843.843 0 0 1-.059-.073.594.594 0 0 0-.194-.184c1.596-.139 4.738-.078 7.057-.033z">
-    //                                     </path>
-    //                                 </svg>
-    //                             </span>
-    //                         </div>`;
-    //                         if(slct_img != ''){
-    //                         chtml += `<img
-    //                             id = "user_img_${slct_user_id}" 
-    //                             src="${slct_img}"
-    //                             alt="" draggable="false" class="user-real-img user-real-img-opcty-1 vsblty-vsbl"
-    //                             style="visibility: visible;">`
-    //                         }
-    //                     chtml += `</div>
-    //                 </div>
-    //             </div>
-    //             <!-- user/groups name status -->
-    //             <div class="users-group-name-wrapper">
-    //                 <div role="gridcell" aria-colindex="2"
-    //                     class="users-group-name-time-grid">
-    //                     <div class="users-group-name-content">
-    //                         <span dir="auto" id="user_name_${slct_user_id}" title="${slct_name}"
-    //                             class="user-name-txt">${slct_name}
-    //                         </span>
-    //                     </div>
-    //                     <div class="users-group-counter-content"><!--yesterday--></div>
-    //                 </div>
-
-    //                 <div class="users-group-second-grid">
-    //                     <div class="users-group-new-msg-txt"></div>
-    //                     <div role="gridcell" aria-colindex="1"
-    //                         class="users-group-counter-content">
-    //                         <span></span>
-    //                     </div>
-    //                 </div>
-
-    //             </div>
-    //         </div>
-    //     </div>
-    //     `;
-    //     return chtml;
-    // }
-
-
-
-
     function getUserProfilePic(user_id){
         //return "";
         $.ajaxSetup({
@@ -799,33 +639,6 @@
         return "";
     }
 
-
-    function searchChatUser(obj){
-        var srchStr = $(obj).text();
-        if(srchStr != ""){
-            $(".search-input-placeholder").hide();
-        }else{
-            $(".search-input-placeholder").show();
-        }
-        //console.log($(obj).text())
-        $(".contact-item-wrapper").each(function(idx,userItem){
-            var user_name = $(userItem).find(".contact-user-name-txt").text();
-            //console.log("user_name: ", user_name)
-            if(user_name.indexOf(srchStr) == -1){
-                $(this).hide();
-            }else{
-                $(this).show();
-            }
-        });
-    }
-
-
-
-
-
-
-
-
     function getReplayMsgContent(chatItem){
         let chat_msg_serializedid = chatItem.data("serializedid");
         let sender_name = chatItem.find(".chat-msg-content .msg-sender-name").html();
@@ -837,8 +650,7 @@
             image_preview_data = $(image_preview[0]).find("img").attr("src");
         }
         html = `<div class="relay-container-width">
-                    <!--wire:model="repaly_msg_id"-->
-                    <input type="hidden" id="repaly_msg_id" value="${chat_msg_serializedid}">
+                    <input type="hidden" wire:model="repaly_msg_id" value="${chat_msg_serializedid}">
                     <div class="relay-container-btn-role" > 
                         <span class="relay-bg-color-1 relay-bg-flex"></span> 
                         <div class="relay-msg-wrapper">
@@ -1466,6 +1278,21 @@
         return "";
     }
 
+    function setMsgsTail(){
+        var svg_tail_out_ltr = '<svg viewBox="0 0 8 13" width="8" height="13"><path opacity=".13" d="M5.188 1H0v11.193l6.467-8.625C7.526 2.156 6.958 1 5.188 1z"></path><path fill="currentColor" d="M5.188 0H0v11.193l6.467-8.625C7.526 1.156 6.958 0 5.188 0z"></path></svg>';
+        var svg_tail_out_rtl = '<svg viewBox="0 0 8 13" width="8" height="13"><path opacity=".13" fill="#0000000" d="M1.533 3.568L8 12.193V1H2.812C1.042 1 .474 2.156 1.533 3.568z" ></path><path fill="currentColor" d="M1.533 2.568L8 11.193V0H2.812C1.042 0 .474 1.156 1.533 2.568z"></path></svg>';
+        //var svg_tail_in_ltr =   '<svg viewBox="0 0 8 13" width="8" height="13"><path opacity=".13" fill="#0000000" d="M1.533 3.568L8 12.193V1H2.812C1.042 1 .474 2.156 1.533 3.568z"></path><path fill="currentColor" d="M1.533 2.568L8 11.193V0H2.812C1.042 0 .474 1.156 1.533 2.568z"></path></svg>';
+        //var svg_tail_in_rtl =   '<svg viewBox="0 0 8 13" width="8" height="13"><path opacity=".13" d="M5.188 1H0v11.193l6.467-8.625C7.526 2.156 6.958 1 5.188 1z"></path><path fill="currentColor" d="M5.188 0H0v11.193l6.467-8.625C7.526 1.156 6.958 0 5.188 0z"></path></svg >';
+
+        var doc_dir = $("html").attr("dir");
+        if (doc_dir == "rtl" || doc_dir == "RTL") {
+            $(".message-out .chat-item-content .chat-item-tail").html(svg_tail_out_rtl);
+            $(".message-in .chat-item-content .chat-item-tail").html(svg_tail_out_ltr);
+        } else {
+            $(".message-out .chat-item-content .chat-item-tail").html(svg_tail_out_ltr);
+            $(".message-in .chat-item-content .chat-item-tail").html(svg_tail_out_rtl);
+        }
+    }
 
     function scrollToElem(elem_id, option){
         let defaultOptions = {

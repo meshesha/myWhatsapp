@@ -33,9 +33,26 @@ class SideBar extends Component
 
     public function checkChatUsrsHash($new_md5){
         if($new_md5 != $this->chats_md5){
-            $this->render();
+            $this->inint();
         }
     }
+
+
+    public function checkUsersChat()
+    {
+        $all_chats = Wpp::getAllChats();
+        $chatsArr = [];
+        if($all_chats != "" && $all_chats['status'] == 'success'){
+            $chatsArr = $all_chats['response'];
+        }
+
+        if(!empty($chatsArr)){
+            $newchats_md5 = md5(json_encode($all_chats));
+            $this->checkChatUsrsHash($newchats_md5);
+        }
+
+    }
+
 
     private function getContants(){
         $all_contacts = Wpp::getAllContacts();
@@ -70,7 +87,7 @@ class SideBar extends Component
         }
     }
 
-    public function render()
+    public function inint()
     {
         if(!session('token') && !session('session')){
             return redirect()->route('wpp.index');//return $this->index();
@@ -94,13 +111,21 @@ class SideBar extends Component
        
         $this->getContants();
         $this->getMyProfile();
+    }
 
+    public function render()
+    {
+        $this->inint();
         return view('livewire.side-bar');
     }
 
-    public function getAllMessages($userId, $is_group)
+    public function getAllMessages($userId, $is_group ,$userName, $user_avater)
     {
        
+        $this->dispatchBrowserEvent('selected_user_avatar',[
+            'user_name' => $userName,
+            'user_img' => $user_avater
+        ]);
         $this->emit('get_all_Messages',$userId, $is_group);
     }
 }
