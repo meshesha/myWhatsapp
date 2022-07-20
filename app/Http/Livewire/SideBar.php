@@ -15,6 +15,8 @@ class SideBar extends Component
     public $all_contants;
     public $myContant;
 
+    public $searchUser;
+
     protected $listeners = ['checkChatUsrsHash'];
 
     private function getAllChatsUsers(){
@@ -22,6 +24,17 @@ class SideBar extends Component
         $chatsArr = [];
         if($all_chats != "" && $all_chats['status'] == 'success'){
             $chatsArr = $all_chats['response'];
+        }
+        if($this->searchUser != null){
+            //dd($chatsArr);
+            $search = $this->searchUser;
+            
+            $chatsArr = array_filter($chatsArr, function($item) use($search){
+                if(strpos($item["contact"]["formattedName"],$search) !== false){
+                    return true;
+                }
+                return false;
+            }) ;
         }
 
         if(!empty($chatsArr)){
@@ -58,7 +71,7 @@ class SideBar extends Component
         $all_contacts = Wpp::getAllContacts();
         $contantsArr = [];
         $myContant = "";
-        $myProfileImg = "";
+        //$myProfileImg = "";
         if($all_contacts != "" && $all_contacts['status'] == 'success'){
             foreach ($all_contacts["response"] as $contact) {
                 if (!$contact["isMe"] && $contact["isMyContact"] && $contact["id"]["user"] != null )
@@ -74,6 +87,7 @@ class SideBar extends Component
 
     private function getMyProfile(){
         $myContant = $this->myContant;
+        $myProfileImg = "";
         if($myContant != ""){
             //$myContantData = Wpp::getContact($myContant["id"]["user"]);
             $profileImg = Wpp::getProfileImg($myContant["id"]["user"]);
@@ -84,6 +98,7 @@ class SideBar extends Component
             if($myProfileImg != ""){
                 $this->profile_md5 = md5(json_encode($profileImg));
             }
+            $this->emit('update_my_profile_img',$myProfileImg);
         }
     }
 

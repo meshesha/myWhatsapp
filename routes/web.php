@@ -35,6 +35,7 @@ Route::get('wpp/chat', [App\Http\Controllers\WppconnectController::class, 'chat'
 Route::post('wpp/chatmsg', [App\Http\Controllers\WppconnectController::class, 'getAllMessagesInChat'])->name('wpp.chatmsg');
 //Route::post('wpp/earlierchatmsg', [App\Http\Controllers\WppconnectController::class, 'earlierMessages'])->name('wpp.earlierchatmsg');
 Route::post('wpp/sendmsg', [App\Http\Controllers\WppconnectController::class, 'sendMessage'])->name('wpp.sendmsg');
+Route::post('wpp/forwordmsg', [App\Http\Controllers\WppconnectController::class, 'forwordMessage'])->name('wpp.forwordmsg');
 Route::get('wpp/msg/{id}', [App\Http\Controllers\WppconnectController::class, 'messageById'])->name('wpp.msg');
 
 //Route::post('wpp/setseen', [App\Http\Controllers\WppconnectController::class, 'setSeenMessage'])->name('wpp.setseen');

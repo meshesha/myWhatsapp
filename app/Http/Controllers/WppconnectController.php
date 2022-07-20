@@ -312,6 +312,24 @@ class WppconnectController extends Controller
      *
      * @return \Illuminate\Http\Response
      */ 
+    public function forwordMessage(Request $request)
+    {
+        $send_to_ary = json_decode($request->input('users'));
+        $msg_id = $request->input('msgId');
+        $send_to = implode(",", $send_to_ary);
+        $response = Wpp::forwardMessages($send_to , $msg_id , false);
+
+        return response()->json(array(
+            'response'=> $response
+        ), 200);
+
+    }
+
+    /**
+     * Show the qr code for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */ 
     // public function setSeenMessage(Request $request)
     // {
         

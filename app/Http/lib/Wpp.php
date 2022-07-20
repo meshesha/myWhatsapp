@@ -235,6 +235,28 @@ class Wpp //extends Component
     }
 
     
+    static public function forwardMessages($user_id , $msgId , $isGroup)
+    {
+        $response = "";
+        $session = session('session');
+        $token = session('token');
+        $bodyArr = [
+            "phone" => $user_id,
+            "messageId" => $msgId
+        ];
+
+        $to = "/api/$session/forward-messages";
+        if($token && $session && session('init')){
+            Wppconnect::make(Wpp::$url);
+            $response = Wppconnect::to($to)->withBody($bodyArr)->withHeaders([
+                'Authorization' => 'Bearer '.$token
+            ])->asJson()->post();
+            $response = json_decode($response->getBody()->getContents(),true);
+        }
+
+        return $response;
+    }
+
     static public function setSeenMessage($userId)
     {
         $response = "";

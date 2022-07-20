@@ -31,6 +31,8 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
   
+    <script src="https://cdn.rawgit.com/mozilla/localForage/master/dist/localforage.js"></script>
+
     <script src="{{ url('jQuery-contextMenu/jquery.contextMenu.js') }}"></script>
     <script src="{{ url('jQuery-contextMenu/jquery.ui.position.min.js') }}"></script>
     <script src="{{ url('popup-menu/popup.js') }}"></script>
@@ -59,7 +61,9 @@
         <div tabindex="-1" class="app-wrapper app-wrapper-web font-fix os-win">
             <div tabindex="-1" class="main-container two">
                 <!-- <div class="_3DJrq"></div> -->
-                @livewire('side-bar')
+                <div class="column-container side-bar side-bar-min-width">
+                    @livewire('side-bar')
+                </div>
                 <!-- main -->
                 <div class="column-container main-content-wrapper">
                     <div id="main" class="main-content-area" style="transform: scaleX(1);">
@@ -104,7 +108,7 @@
                             <!-- settings -->
                             <div class="main-head-menu-area">
                                 <div class="menu-area-container menu-area-color">
-                                    <div class="menu-btn-container">
+                                    {{-- <div class="menu-btn-container">
                                         <div aria-disabled="false" role="button" tabindex="0" class="btns-content"
                                             data-tab="6" title="Search…" aria-label="Search…">
                                             <span data-testid="search-alt" data-icon="search-alt" class="">
@@ -115,7 +119,21 @@
                                                 </svg>
                                             </span>
                                         </div>
+                                    </div> --}}
+                                    <div class="menu-btn-container open-all-chat-users" data-isshow="false">
+                                        <div aria-disabled="false" role="button" tabindex="0" class="btns-content"
+                                            data-tab="6" title="Users" aria-label="Users">
+                                            <span data-testid="users" data-icon="users" width="24" height="24">
+                                                {{-- <svg viewBox="0 0 24 24" width="24" height="24" class="">
+                                                    <path fill="currentColor"
+                                                        d="M15.9 14.3H15l-.3-.3c1-1.1 1.6-2.7 1.6-4.3 0-3.7-3-6.7-6.7-6.7S3 6 3 9.7s3 6.7 6.7 6.7c1.6 0 3.2-.6 4.3-1.6l.3.3v.8l5.1 5.1 1.5-1.5-5-5.2zm-6.2 0c-2.6 0-4.6-2.1-4.6-4.6s2.1-4.6 4.6-4.6 4.6 2.1 4.6 4.6-2 4.6-4.6 4.6z">
+                                                    </path>
+                                                </svg> --}}
+                                                <i class="fas fa-users"></i>
+                                            </span>
+                                        </div>
                                     </div>
+                                    
                                     <div>
                                         <div class="menu-btn-container">
                                             <div aria-disabled="false" role="button" tabindex="0" class="btns-content"
@@ -179,6 +197,7 @@
         </div>
         <div hidden="" style="display: none;"></div>
         <div class="loadin-spinng"></div>
+    @yield('above_livewire_foot_script')
     @livewireScripts
     @yield('foot_script')
 </body>

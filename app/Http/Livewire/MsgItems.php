@@ -55,38 +55,39 @@ class MsgItems extends Component
     }
 
     
-    public function checkChatUsrsHash($new_md5){
+    public function checkChatMsgsHash($new_md5){
+        //dd($new_md5 .",". $this->chats_md5);
         if($new_md5 != $this->chats_md5){
             $this->checkMsg();
         }
     }
 
 
-    public function inint()
-    {
-        if(!session('token') && !session('session')){
-            return redirect()->route('wpp.index');//return $this->index();
-        }
-        $conn_status = Wpp::checkWppSessionStatus();
+    // public function inint()
+    // {
+    //     if(!session('token') && !session('session')){
+    //         return redirect()->route('wpp.index');//return $this->index();
+    //     }
+    //     $conn_status = Wpp::checkWppSessionStatus();
         
-        if($conn_status['status'] != true){
-            //return redirect()->route("home");
-            session([
-                'init' => false,
-                'session' => '',
-                'token' => ''
-            ]);
+    //     if($conn_status['status'] != true){
+    //         //return redirect()->route("home");
+    //         session([
+    //             'init' => false,
+    //             'session' => '',
+    //             'token' => ''
+    //         ]);
 
-            return redirect()->route('wpp.index');//$this->index();
-        }
-        //dd($conn_status);
-        session(['init' => true]);
+    //         return redirect()->route('wpp.index');//$this->index();
+    //     }
+    //     //dd($conn_status);
+    //     session(['init' => true]);
         
-        $this->getAllChatsUsers();
+    //     $this->getAllChatsUsers();
        
-        $this->getContants();
-        $this->getMyProfile();
-    }
+    //     $this->getContants();
+    //     $this->getMyProfile();
+    // }
 
 
 
@@ -157,7 +158,8 @@ class MsgItems extends Component
             if($response && $response["status"] == "success"){
                 $this->msg_items = $response["response"];
             }
-            $this->dispatchBrowserEvent('msgs-loaded',[
+
+            $this->dispatchBrowserEvent('new-msgs-loaded',[
                 'hash' => $new_chats_md5,
                 'selected_user' => $currentUserId,
                 'is_group' => $currentIsGroup
