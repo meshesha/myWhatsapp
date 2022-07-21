@@ -19,6 +19,9 @@
     <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/font-awesome.min.css"> -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <!-- Styles -->
+    
+    <script src="{{ url('sweetalert2/dist/sweetalert2.all.min.js') }}"></script>
+
     <link href="{{ url('css/main.css') }}" rel="stylesheet">
     <link href="{{ url('jQuery-contextMenu/jquery.contextMenu.min.css') }}" rel="stylesheet">
     <link href="{{ url('popup-menu/popup.css') }}" rel="stylesheet">
@@ -41,16 +44,27 @@
     <!-- <script src="//twemoji.maxcdn.com/twemoji.min.js"></script> -->
     <!-- <script src="{{ url('emoji_picker/vanillaEmojiPicker.js') }}"></script> -->
     <!-- <script src="{{ url('wasap_emoji/wasap_emoji.js') }}"></script> -->
-    <script src="{{ url('sweetalert2/dist/sweetalert2.all.min.js') }}"></script>
     <script src="{{ url('Magnific-Popup-1.1.0/jquery.magnific-popup.min.js') }}"></script>
 
     <link href="{{ url('emoji-mart-outside-react/emoji-mart/css/emoji-mart.css') }}" rel="stylesheet">
+
+    <link href="https://unpkg.com/filepond@^4/dist/filepond.css" rel="stylesheet" />
+
+    <!-- include FilePond plugins -->
+    <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css" rel="stylesheet"/>
+    <link href="{{ url('filepond-plugin-media-preview/filepond-plugin-media-preview.css') }}" rel="stylesheet">
+
+
+    {{-- <!-- include FilePond jQuery adapter -->
+    <script src="https://unpkg.com/jquery-filepond/filepond.jquery.js"></script> --}}
+
+
+
     @livewireStyles
 
     @yield('head_style')
     @yield('head_script')    
     <script src="{{ url('emoji-mart-outside-react/dist/main.js') }}" type="text/javascript"></script>
-
 </head>
 <body>
 <div id="app">
@@ -197,6 +211,13 @@
         </div>
         <div hidden="" style="display: none;"></div>
         <div class="loadin-spinng"></div>
+    
+    <!-- include FilePond library -->
+    
+    <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.js"></script>
+    {{-- <script src="https://unpkg.com/filepond-plugin-image-crop/dist/filepond-plugin-image-crop.js"></script> --}}
+    <script src="{{ url('filepond-plugin-media-preview/filepond-plugin-media-preview.js') }}"></script>
+    <script src="https://unpkg.com/filepond/dist/filepond.min.js"></script>
     @yield('above_livewire_foot_script')
     @livewireScripts
     @yield('foot_script')

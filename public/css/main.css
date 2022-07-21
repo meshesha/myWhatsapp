@@ -3010,4 +3010,9 @@ html[dir] .close_replay_msg_btn {
 
         .contact-list-swel {
             height: 95vh;
+            width: 50vw;
+          }
+
+          .swal2-file{
+            margin-top: 0 ;
           }

@@ -109,7 +109,35 @@
         var last_elem_id = "";
         var users_contants;
         sessionStorage.setItem("users_contants_html", "");
-       
+        
+        // Register the plugin
+        var pond = null;
+        FilePond.registerPlugin(FilePondPluginImagePreview);
+        FilePond.registerPlugin(FilePondPluginMediaPreview);
+        FilePond.setOptions({
+            server: {
+                url: '/filepond/api',
+                process: '/process',
+                revert: '/process',
+                patch: "?patch=",
+                headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            }
+        });
+        //FilePond.registerPlugin(FilePondPluginImageCrop);
+
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'center-center',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+        });
 
         $(document).ready(function() {
 
@@ -120,6 +148,9 @@
             var read_stt_dblcheck_elm =
                 '<span data-testid="msg-dblcheck" aria-label=" Delivered " data-icon="msg-dblcheck" class=""><svg viewBox="0 0 16 15" width="16" height="15" class=""><path fill="currentColor" d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L8.666 9.879a.32.32 0 0 1-.484.033l-.358-.325a.319.319 0 0 0-.484.032l-.378.483a.418.418 0 0 0 .036.541l1.32 1.266c.143.14.361.125.484-.033l6.272-8.048a.366.366 0 0 0-.064-.512zm-4.1 0l-.478-.372a.365.365 0 0 0-.51.063L4.566 9.879a.32.32 0 0 1-.484.033L1.891 7.769a.366.366 0 0 0-.515.006l-.423.433a.364.364 0 0 0 .006.514l3.258 3.185c.143.14.361.125.484-.033l6.272-8.048a.365.365 0 0 0-.063-.51z"></path></svg></span>';
 
+            
+            //$.fn.filepond.registerPlugin(FilePondPluginImagePreview);
+            
             //
             $(".chat-container").on("scroll", function() {
                 //console.log("heigth: ", $(this).scrollTop() , this.scrollHeight - $(this).height())
@@ -266,38 +297,82 @@
                 zIndex: 1000,
                 popItemClick: function(e) {
                     let menu_type = $(this).attr("id");
-                    console.log("menu", menu_type)
+                    
+                    console.log("selected menu:", menu_type)
                     if (menu_type == "media") {
                         const file = Swal.fire({
-                            title: 'Select image',
-                            showCancelButton: true,
-                            input: 'file',
-                            inputAttributes: {
-                                'accept': 'image/*',
-                                'aria-label': 'Upload your profile picture'
+                            // title: 'Select image',
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            customClass: {
+                                popup: 'contact-list-swel'
                             },
-                            html: '<div class="upload-img-preview" ></div>',
-                            inputValidator: (result) => {
-                                console.log(result)
+                            showCancelButton: true,
+                            confirmButtonText: 'שלח',
+                            // input: 'file',
+                            // inputAttributes: {
+                            //     'accept': 'video/*,image/*',
+                            //     'aria-label': 'Upload yours picture'
+                            // },
+                            // inputValidator: (result) => {
+                            //     console.log("upload-img-preview: ", result)
+                            // },
+                            html: '<div class="upload-img-preview" ><input type="file" class="pond-file" /></div>',
+                            //html: '<div class="upload-img-preview" ></div>',
+                            didRender: () => {
+
+                                // Create a FilePond instance
+                                pond = FilePond.create( document.querySelector('.pond-file'), {
+                                    instantUpload: false
+                                });
+
+                                //$('.pond-file').filepond();
+                            },
+                            preConfirm: () => {
+                                
+                                pond.processFiles().then((files) => {
+                                    // files have been processed
+                                    console.log("pond.processFiles:", files)
+                                    if(files.length > 0){
+                                        Swal.close();
+                                        Toast.fire({
+                                            icon: 'success',
+                                            title: 'uploaded in successfully'                 
+                                        })
+
+                                        return true;
+
+                                    }
+                                });
+                                
+                                 return false; // Prevent confirmed
+                                
+                            }
+                        }).then((result) => {
+                            /* Read more about isConfirmed, isDenied below */
+                            if (result.isConfirmed) {
+                                //Swal.fire('Changes are not saved', '', 'info')
+                            } else if (result.isDenied) {
+                                Swal.fire('Changes are not saved', '', 'info')
                             }
                         })
-                        $(".swal2-file").on("change", function(result) {
-                            console.log("file result: ", result.target.files[0])
-                            if (result.target.files[0]) {
-                                const reader = new FileReader()
-                                reader.onload = (e) => {
-                                    // Swal.fire({
-                                    // title: 'Your uploaded picture',
-                                    // imageUrl: e.target.result,
-                                    // imageAlt: 'The uploaded picture'
-                                    // })
-                                    let htmlImg = "<img src='" + e.target.result +
-                                        "' height='200' >";
-                                    $(".upload-img-preview").html(htmlImg);
-                                }
-                                reader.readAsDataURL(result.target.files[0])
-                            }
-                        })
+                        // $(".swal2-file").on("change", function(result) {
+                        //     console.log("file result: ", result.target.files[0])
+                        //     if (result.target.files[0]) {
+                        //         const reader = new FileReader()
+                        //         reader.onload = (e) => {
+                        //             // Swal.fire({
+                        //             // title: 'Your uploaded picture',
+                        //             // imageUrl: e.target.result,
+                        //             // imageAlt: 'The uploaded picture'
+                        //             // })
+                        //             let htmlImg = "<img src='" + e.target.result +
+                        //                 "' height='200' >";
+                        //             $(".upload-img-preview").html(htmlImg);
+                        //         }
+                        //         reader.readAsDataURL(result.target.files[0])
+                        //     }
+                        // })
 
                     }
                 }
