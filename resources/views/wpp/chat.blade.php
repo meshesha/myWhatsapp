@@ -91,7 +91,31 @@
     bottom: 0;
     padding-top: 5px;
     background: rgb(203, 203, 203);
+	/* box-sizing: border-box;
+	flex: none;
+	transition: box-shadow .18s ease-out, background-color .25s ease-out; */
 }
+/* .side-search-container {
+	position: relative;
+	z-index: 100;
+	height: 49px;
+} */
+/* 
+
+.swal2-actions .textbox-input {
+	position: relative;
+	width: 50%;
+	min-height: 20px;
+	font-size: 17px;
+	line-height: 20px;
+	color: #4a4a4a;
+	word-wrap: break-word;
+	white-space: pre-wrap;
+	-webkit-user-select: text;
+	-moz-user-select: text;
+	-ms-user-select: text;
+	user-select: text;
+} */
     </style>
 @endsection
 
@@ -319,13 +343,16 @@
                             // },
                             html: '<div class="upload-img-preview" ><input type="file" class="pond-file" /></div>',
                             //html: '<div class="upload-img-preview" ></div>',
+                            //footer: "<h3>Test</h3>",
                             didRender: () => {
 
                                 // Create a FilePond instance
                                 pond = FilePond.create( document.querySelector('.pond-file'), {
-                                    instantUpload: false
+                                    instantUpload: false,
+                                    allowProcess: false
                                 });
 
+                                //$(".swal2-actions").append("<input type='text' class='textbox-input' id='imge_msg_text_msg' />");
                                 //$('.pond-file').filepond();
                             },
                             preConfirm: () => {
