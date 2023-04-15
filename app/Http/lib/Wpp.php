@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\lib;
-
+use App\Models\SessionTokens;
 use Wppconnect;
 
 class Wpp //extends Component
@@ -11,21 +11,32 @@ class Wpp //extends Component
     //public $key;
     //public $session;
     
-    static public function startWppSession()
-    {
-        $response = "";
-        $session = session('session');
-        $token = session('token');
-        Wppconnect::make(Wpp::$url);
-        $response = Wppconnect::to('/api/'.$session.'/start-session')->withHeaders([
-            'Authorization' => 'Bearer '.$token
-        ])->asJson()->post();
-        $response = json_decode($response->getBody()->getContents(),true);
+    // static public function startWppSession()
+    // {
+    //     $response = "";
+    //     $session = session('session');
+    //     $token = session('token');
+    //     Wppconnect::make(Wpp::$url);
+    //     $response = Wppconnect::to('/api/'.$session.'/start-session')->withHeaders([
+    //         'Authorization' => 'Bearer '.$token
+    //     ])->asJson()->post();
+    //     $response = json_decode($response->getBody()->getContents(),true);
 
-        return $response;
-    }
+    //     return $response;
+    // }
+
     static public function generateToken($key, $user)
     {
+        if($user->wpp_session != "" && $user->wpp_token != ""){
+           $stt = Wpp::startSession($user->wpp_session,$user->wpp_token);
+           //$stt = Wpp::restartService($user->wpp_session,$user->wpp_token);
+           if($stt["status"] == "CONNECTED"){
+                session(['token' => $user->wpp_token]);
+                session(['session' => $user->wpp_session]);
+                session(['init' => true]);
+                //dd($stt);
+           }
+        }
         if((!session('token') && !session('session')) || ($user->wpp_token == "")){
             $session = md5(uniqid($user->email));
             Wppconnect::make(Wpp::$url);
@@ -39,6 +50,12 @@ class Wpp //extends Component
                 session(['session' => $response['session']]);
                 $user->wpp_session = $response['session'];
                 $user->save();
+
+                $sessiontoken = new SessionTokens;
+                $sessiontoken->user_id = $user->id;
+                $sessiontoken->session = $response['session'];
+                $sessiontoken->token = $response['token'];
+                $sessiontoken->save();
             }
         }
 
@@ -46,30 +63,94 @@ class Wpp //extends Component
 	    //# /api/:session/start-session
 		
         if(session('token') && session('session') && !session('init')){
-            $response = Wpp::startWppSession();
+            $response = Wpp::startSession(session('session'), session('token'));//startWppSession();
             session(['init' => true]);
         }
     }
 
-    static public function getWppQrcode()
+    // static public function getWppQrcode()
+    // {
+    //     $response = "";
+    //     $session = session('session');
+    //     $token = session('token');
+    //     Wppconnect::make(Wpp::$url);//qrcode-session
+    //     $response = Wppconnect::to('/api/'.$session.'/start-session')->withHeaders([
+    //         'Authorization' => 'Bearer '.$token
+    //     ])->asJson()->get();
+    //     $response = json_decode($response->getBody()->getContents(),true);
+    //     return $response;
+    // }
+
+    
+    static public function getAllSession($key)
     {
         $response = "";
-        $session = session('session');
-        $token = session('token');
+        //$token = session('token');
         Wppconnect::make(Wpp::$url);//qrcode-session
-        $response = Wppconnect::to('/api/'.$session.'/start-session')->withHeaders([
+        $response = Wppconnect::to('/api/'.$key.'/show-all-sessions')->asJson()->get();
+        $response = json_decode($response->getBody()->getContents(),true);
+        return $response;
+    }
+    
+    static public function startAllSession($key)
+    {
+        $response = "";
+        //$token = session('token');
+        Wppconnect::make(Wpp::$url, false);//qrcode-session
+        $response = Wppconnect::to('/api/'.$key.'/start-all')->asJson()->post();
+        $response = json_decode($response->getBody()->getContents(),true);
+        return $response;
+    }
+    
+    
+    static public function closeSession($session_id)
+    {
+        $response = "";
+        $token = session('token');
+        Wppconnect::make(Wpp::$url, false);//qrcode-session
+        $response = Wppconnect::to('/api/'.$session_id.'/close-session')->withHeaders([
             'Authorization' => 'Bearer '.$token
-        ])->asJson()->get();
+        ])->asJson()->post();
         $response = json_decode($response->getBody()->getContents(),true);
         return $response;
     }
 
-    static public function checkWppSessionStatus()
+    
+    static public function restartService($session, $token)
     {
         $response = "";
-        $session = session('session');
+        //$token = session('token');
+        Wppconnect::make(Wpp::$url, false);//qrcode-session
+        $response = Wppconnect::to('/api/'.$session.'/restart-service')->withHeaders([
+            'Authorization' => 'Bearer '.$token
+        ])->asJson()->post();
+        $response = json_decode($response->getBody()->getContents(),true);
+        return $response;
+    }
+
+    
+    static public function startSession($session, $token)
+    {
+        $response = "";
+        //$token = session('token');
+        Wppconnect::make(Wpp::$url, false);//qrcode-session
+        $response = Wppconnect::to('/api/'.$session.'/start-session')->withHeaders([
+            'Authorization' => 'Bearer '.$token
+        ])->asJson()->post();
+        $response = json_decode($response->getBody()->getContents(),true);
+        return $response;
+    }
+
+
+
+    static public function checkWppSessionStatus($session = null)
+    {
+        $response = "";
+        if($session == null){
+            $session = session('session');
+        }
         $token = session('token');
-        Wppconnect::make(Wpp::$url);
+        Wppconnect::make(Wpp::$url, false);
         $response = Wppconnect::to('/api/'.$session.'/check-connection-session')->withHeaders([
             'Authorization' => 'Bearer '.$token
         ])->asJson()->get();
@@ -158,33 +239,39 @@ class Wpp //extends Component
             $response = Wppconnect::to($to)->withHeaders([
                 'Authorization' => 'Bearer '.$token 
             ])->asJson()->get();
+            
             $response = json_decode($response->getBody()->getContents(),true);
         }
 
         return $response;
     }
 
-    static public function getEarlierMessages($userId, $isgroup)
+    static public function getEarlierMessages($userId, $isgroup, $last_msg_id)
     {
 
         $response = "";
         $session = session('session');
         $token = session('token');
         
-        $to = "/api/$session/load-earlier-messages/$userId?isGroup=".$isgroup ;
+        $to = "/api/$session/get-messages/$userId?isGroup=".$isgroup."&count=-1" ;
         
-            if($token && $session && session('init')){
-                Wppconnect::make(Wpp::$url , false);
-                try{
-                    $response = Wppconnect::to($to)->withHeaders([
-                        'Authorization' => 'Bearer '.$token 
-                    ])->asJson()->get();    
-                }catch(Exception $e){
+        if($last_msg_id != ""){
+            $to .= "&id=$last_msg_id&direction=before"; 
+            // $to .= "&id=$last_msg_id&direction=after"; 
+        }
 
-                }
+        if($token && $session && session('init')){
+            Wppconnect::make(Wpp::$url , false);
+            try{
+                $response = Wppconnect::to($to)->withHeaders([
+                    'Authorization' => 'Bearer '.$token 
+                ])->asJson()->get();    
+            }catch(Exception $e){
 
-                //$response = json_decode($response->getBody()->getContents(),true);
             }
+
+            //$response = json_decode($response->getBody()->getContents(),true);
+        }
         if($response != "" && $response != null){
             $response = json_decode($response->getBody()->getContents(),true);
         }
@@ -281,4 +368,31 @@ class Wpp //extends Component
         }
         return $response;
     }
+
+
+    static public function SendBase64File($user_id , $base64 ,$fileName, $msg , $isGroup)
+    {
+        $response = "";
+        $session = session('session');
+        $token = session('token');
+        $bodyArr = [
+            "phone" => $user_id,
+            "base64" => $base64,
+            "filename" => $fileName,
+            "message" => $msg,
+            "isGroup" => $isGroup,
+        ];
+
+        $to = "/api/$session/send-file-base64";
+        if($token && $session && session('init')){
+            Wppconnect::make(Wpp::$url);
+            $response = Wppconnect::to($to)->withBody($bodyArr)->withHeaders([
+                'Authorization' => 'Bearer '.$token
+            ])->asJson()->post();
+            $response = json_decode($response->getBody()->getContents(),true);
+        }
+
+        return $response;
+    }
+
 }

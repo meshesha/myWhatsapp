@@ -1,222 +1,143 @@
 <?php
 
-namespace App\Http\Livewire;
+namespace App\Http\lib;
 
-use Livewire\Component;
-use App\Http\lib\Wpp;
+/*
+ * This file is part of the VCard PHP Class from Jeroen Desloovere.
+ *
+ * For the full copyright and license information, please view the license
+ * file that was distributed with this source code.
+ */
 
-//use App\Http\lib\VCardParser;
+use Iterator;
 
-class MsgItems extends Component
+/**
+ * VCard PHP Class to parse .vcard files.
+ *
+ * This class is heavily based on the Zendvcard project (seemingly abandoned),
+ * which is licensed under the Apache 2.0 license.
+ * More information can be found at https://code.google.com/archive/p/zendvcard/
+ */
+class VCardParser implements Iterator
 {
-    public $chats_md5;
-    public $current_user;
-    public $current_is_goroup;
-    public $msg_items = [];
-    public $types_arry = ["chat", "image","video", "audio", "ptt","location","vcard"];
-    protected $listeners = ['get_all_Messages' => 'getAllMessagesInChat','checkChatMsgsHash'];
-    // protected $listeners = ['checkChatMsgsHash'];protected $guzzleHelper;
-    // protected $vcardParser;
-    // public function mount() //VCardParser $vcardParser
-    // {
-    //     $this->vcardParser = new VCardParser("hello");
-    // }
-    public function getAllMessagesInChat($userId, $is_group)
-    { 
-        //dd($userId, $is_group);
-        // $startTime = microtime(true);
-        $response = "";
-        $session = session('session');
-        $token = session('token');
+    /**
+     * The raw VCard content.
+    *
+     * @var string
+     */
+    protected $content;
 
-        $this->current_user = $userId;
-        $this->current_is_goroup = $is_group;
+    /**
+     * The VCard data objects.
+     *
+     * @var array
+     */
+    protected $vcardObjects;
 
-        //?isGroup=false&includeMe=true&includeNotifications=false
-        // $isgroup = ($is_group == 'yes')?true:false;
-        $isgroup = ($is_group == 'yes')?'true':'false';
-        $incMe = 1;
-        $incNotif = 'true';
+    /**
+     * The iterator position.
+     *
+     * @var int
+     */
+    protected $position;
 
-        
-        $phon_num = str_replace(array("@c.us","@g.us"), array("",""), $userId);
-        
-        $response = Wpp::getChatById($phon_num, $isgroup);
-       
-        $this->chats_md5 = md5(json_encode($response));
-
-        // dd($response);
-        // && isset($response["status"])
-        $last_msg_id = "";
-        if($response != "" && isset($response["status"]) && $response["status"] == "success"){ 
-            if(count($response["response"]) > 0){
-                $last_msg_id = $response["response"][0]["id"]??"";
-                // if($last_msg_id != ""){
-                //     $last_msg_id_ary = explode("_", $last_msg_id);
-                //     $last_msg_id = $last_msg_id_ary[2];
-                // }
-            }
-            $this->msg_items = $response["response"];
-        }
-
-        // dd($last_msg_id);
-        
-        // $erlier_msg = $this->earlierMessages($userId, $is_group, $last_msg_id);
-        // dd($erlier_msg);
-
-        $hash = $this->chats_md5;
-        $this->dispatchBrowserEvent('msgs-loaded',[
-            'hash' => $hash,
-            'selected_user' => $userId,
-            'is_group' => $is_group
-        ]);
-        //$this->render();
-    //    $runTime = number_format(microtime(true) - $startTime, 9);
-    //     dd("Run Time: $runTime ms");
-    }
-
-    
-    public function checkChatMsgsHash($new_md5){
-        //dd($new_md5 .",". $this->chats_md5);
-        if($new_md5 != $this->chats_md5){
-            $this->checkMsg();
-        }
-    }
-
-
-    // public function inint()
-    // {
-    //     if(!session('token') && !session('session')){
-    //         return redirect()->route('wpp.index');//return $this->index();
-    //     }
-    //     $conn_status = Wpp::checkWppSessionStatus();
-        
-    //     if($conn_status['status'] != true){
-    //         //return redirect()->route("home");
-    //         session([
-    //             'init' => false,
-    //             'session' => '',
-    //             'token' => ''
-    //         ]);
-
-    //         return redirect()->route('wpp.index');//$this->index();
-    //     }
-    //     //dd($conn_status);
-    //     session(['init' => true]);
-        
-    //     $this->getAllChatsUsers();
-       
-    //     $this->getContants();
-    //     $this->getMyProfile();
-    // }
-
-
-
-    public function earlierMessages($userId, $is_group, $last_msg_id)
+    /**
+     * Helper function to parse a file directly.
+     *
+     * @param string $filename
+     * @return self
+     */
+    public static function parseFromFile($filename)
     {
-        //userId => userSrializeId, 
-        //?isGroup=false&includeMe=true&includeNotifications=false
-        $isgroup = ($is_group == 'yes')?'true':'false';
-        try{
-            $response = Wpp::getEarlierMessages($userId, $isgroup, $last_msg_id);
-            
-            $chats_md5 = md5(json_encode($response));
-
-            return array(
-                'response'=> $response,
-                'status' => ($response != "" && $response["status"])?$response["status"]:"fail",
-                'chats_md5' => $chats_md5
-            );
-        }catch(Exception $e){
-
-            return array(
-                'response'=> $e,
-                'status' => 'fail',
-                'chats_md5' => '-1'
-            );
-
+        if (file_exists($filename) && is_readable($filename)) {
+            return new self(file_get_contents($filename));
+        } else {
+            throw new \RuntimeException(sprintf("File %s is not readable, or doesn't exist.", $filename));
         }
     }
 
-    public function setSeenMessage($userId)
+    public function __construct($content)
     {
-        //userId = userSrializeId.replace(/[@c.us,@c.us]/g, "");
-        try{
-            Wpp::setSeenMessage($userId);
-        }catch(Exception $e){
-
-        }
+        $this->content = $content;
+        $this->vcardObjects = [];
+        $this->rewind();
+        $this->parse();
     }
 
-
-    public function checkMsg(){
-
-        $currentUserId = $this->current_user;
-        $currentIsGroup = $this->current_is_goroup;
-        if($currentUserId == "" || $currentUserId == null){
-            return false;
-        }
-        $isgroup = ($currentIsGroup == 'yes')?true:false;
-        //$incMe = 1;
-        //$incNotif = 'true';
-        
-        $phon_num = str_replace(array("@c.us","@g.us"), array("",""), $currentUserId);
-        
-        $response = Wpp::getChatById($phon_num, $isgroup);
-       
-        $new_chats_md5 = md5(json_encode($response));
-
-        // $this->dispatchBrowserEvent('check-msgs',
-        //     ['new_hash' => $new_chats_md5,
-        //     'current_user' => $currentUserId,
-        //     'is_group' => $currentIsGroup
-        // ]);
-        
-        if($this->chats_md5 != $new_chats_md5){
-            //refreah
-            //$this->getAllMessagesInChat($currentUserId , $currentIsGroup);
-            $this->chats_md5 = $new_chats_md5;
-            if($response && $response["status"] == "success"){
-                $this->msg_items = $response["response"];
-            }
-
-            $this->dispatchBrowserEvent('new-msgs-loaded',[
-                'hash' => $new_chats_md5,
-                'selected_user' => $currentUserId,
-                'is_group' => $currentIsGroup
-            ]);
-            //$this->render();
-        }
-    }
-
-    public function render()
+    public function rewind()
     {
-        return view('livewire.msg-items');
+        $this->position = 0;
     }
 
-
-
-
-
-
-
-
-
-    
-    protected function vcardParser($content)
+    public function current()
     {
-        
+        if ($this->valid()) {
+            return $this->getCardAtIndex($this->position);
+        }
+    }
+
+    public function key()
+    {
+        return $this->position;
+    }
+
+    public function next()
+    {
+        $this->position++;
+    }
+
+    public function valid()
+    {
+        return !empty($this->vcardObjects[$this->position]);
+    }
+
+    /**
+     * Fetch all the imported VCards.
+     *
+     * @return array
+     *    A list of VCard card data objects.
+     */
+    public function getCards()
+    {
+        return $this->vcardObjects;
+    }
+
+    /**
+     * Fetch the imported VCard at the specified index.
+     *
+     * @throws OutOfBoundsException
+     *
+     * @param int $i
+     *
+     * @return stdClass
+     *    The card data object.
+     */
+    public function getCardAtIndex($i)
+    {
+        if (isset($this->vcardObjects[$i])) {
+            return $this->vcardObjects[$i];
+        }
+        throw new \OutOfBoundsException();
+    }
+
+    /**
+     * Start the parsing process.
+     *
+     * This method will populate the data object.
+     */
+    protected function parse()
+    {
         // Normalize new lines.
-        $content = str_replace(["\r\n", "\r"], "\n", $content);
+        $this->content = str_replace(["\r\n", "\r"], "\n", $this->content);
 
         // RFC2425 5.8.1. Line delimiting and folding
         // Unfolding is accomplished by regarding CRLF immediately followed by
         // a white space character (namely HTAB ASCII decimal 9 or. SPACE ASCII
         // decimal 32) as equivalent to no characters at all (i.e., the CRLF
         // and single white space character are removed).
-        $content = preg_replace("/\n(?:[ \t])/", "", $content);
-        $lines = explode("\n", $content);
-        //dd($lines);
+        $this->content = preg_replace("/\n(?:[ \t])/", "", $this->content);
+        $lines = explode("\n", $this->content);
+
         // Parse the VCard, line by line.
         foreach ($lines as $line) {
             $line = trim($line);
@@ -224,8 +145,7 @@ class MsgItems extends Component
             if (strtoupper($line) == "BEGIN:VCARD") {
                 $cardData = new \stdClass();
             } elseif (strtoupper($line) == "END:VCARD") {
-                //$this->vcardObjects[] = $cardData;
-                return $cardData;
+                $this->vcardObjects[] = $cardData;
             } elseif (!empty($line)) {
                 // Strip grouping information. We don't use the group names. We
                 // simply use a list for entries that have multiple values.
@@ -275,7 +195,7 @@ class MsgItems extends Component
                     }
                     $i++;
                 }
-                //dump($element);
+
                 switch (strtoupper($element)) {
                     case 'FN':
                         $cardData->fullname = $value;
@@ -299,21 +219,7 @@ class MsgItems extends Component
                         if (!isset($cardData->phone)) {
                             $cardData->phone = [];
                         }
-                        
-                        foreach ($types as $type_) {
-                            if(strpos($type_,"waid") !== false){
-                                @list(, $waid) = explode('=', $type_);
-                                $cardData->waid = $waid;
-                            }
-                        }
-                        //dump($types);
-                        $types = array_filter($types, function($val){
-                            if(strpos($val,"waid") !== false){
-                               return false;
-                            }
-                        });
-                        //dump($types);
-                        $key = (!empty($types))? implode(';', $types) : 'default';
+                        $key = !empty($types) ? implode(';', $types) : 'default';
                         $cardData->phone[$key][] = $value;
                         break;
                     case 'EMAIL':
@@ -369,6 +275,7 @@ class MsgItems extends Component
             }
         }
     }
+
     protected function parseName($value)
     {
         @list(
@@ -386,10 +293,12 @@ class MsgItems extends Component
             'suffix' => $suffix,
         ];
     }
+
     protected function parseBirthday($value)
     {
         return new \DateTime($value);
     }
+
     protected function parseAddress($value)
     {
         @list(
@@ -412,7 +321,6 @@ class MsgItems extends Component
         ];
     }
 
-    
     /**
      * Unescape newline characters according to RFC2425 section 5.8.4.
      * This function will replace escaped line breaks with PHP_EOL.
@@ -425,6 +333,4 @@ class MsgItems extends Component
     {
         return str_replace("\\n", PHP_EOL, $text);
     }
-
-
 }

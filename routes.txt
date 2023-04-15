@@ -1,50 +1,57 @@
-+--------+----------+-------------------------+--------------------+------------------------------------------------------------------------+---------------------------------------------+
-| Domain | Method   | URI                     | Name               | Action                                                                 | Middleware                                  |
-+--------+----------+-------------------------+--------------------+------------------------------------------------------------------------+---------------------------------------------+
-|        | GET|HEAD | /                       |                    | App\Http\Controllers\HomeController@index                              | web                                         |
-|        |          |                         |                    |                                                                        | App\Http\Middleware\Authenticate            |
-|        | GET|HEAD | api/user                |                    | Closure                                                                | api                                         |
-|        |          |                         |                    |                                                                        | App\Http\Middleware\Authenticate:sanctum    |
-|        | GET|HEAD | home                    | home               | App\Http\Controllers\HomeController@index                              | web                                         |
-|        |          |                         |                    |                                                                        | App\Http\Middleware\Authenticate            |
-|        | GET|HEAD | login                   | login              | App\Http\Controllers\Auth\LoginController@showLoginForm                | web                                         |
-|        |          |                         |                    |                                                                        | App\Http\Middleware\RedirectIfAuthenticated |
-|        | POST     | login                   |                    | App\Http\Controllers\Auth\LoginController@login                        | web                                         |
-|        |          |                         |                    |                                                                        | App\Http\Middleware\RedirectIfAuthenticated |
-|        | POST     | logout                  | logout             | App\Http\Controllers\Auth\LoginController@logout                       | web                                         |
-|        | GET|HEAD | password/confirm        | password.confirm   | App\Http\Controllers\Auth\ConfirmPasswordController@showConfirmForm    | web                                         |
-|        |          |                         |                    |                                                                        | App\Http\Middleware\Authenticate            |
-|        | POST     | password/confirm        |                    | App\Http\Controllers\Auth\ConfirmPasswordController@confirm            | web                                         |
-|        |          |                         |                    |                                                                        | App\Http\Middleware\Authenticate            |
-|        | POST     | password/email          | password.email     | App\Http\Controllers\Auth\ForgotPasswordController@sendResetLinkEmail  | web                                         |
-|        | GET|HEAD | password/reset          | password.request   | App\Http\Controllers\Auth\ForgotPasswordController@showLinkRequestForm | web                                         |
-|        | POST     | password/reset          | password.update    | App\Http\Controllers\Auth\ResetPasswordController@reset                | web                                         |
-|        | GET|HEAD | password/reset/{token}  | password.reset     | App\Http\Controllers\Auth\ResetPasswordController@showResetForm        | web                                         |
-|        | GET|HEAD | register                | register           | App\Http\Controllers\Auth\RegisterController@showRegistrationForm      | web                                         |
-|        |          |                         |                    |                                                                        | App\Http\Middleware\RedirectIfAuthenticated |
-|        | POST     | register                |                    | App\Http\Controllers\Auth\RegisterController@register                  | web                                         |
-|        |          |                         |                    |                                                                        | App\Http\Middleware\RedirectIfAuthenticated |
-|        | GET|HEAD | sanctum/csrf-cookie     |                    | Laravel\Sanctum\Http\Controllers\CsrfCookieController@show             | web                                         |
-|        | GET|HEAD | wpp                     | wpp.index          | App\Http\Controllers\WppconnectController@index                        | web                                         |
-|        |          |                         |                    |                                                                        | App\Http\Middleware\Authenticate            |
-|        | GET|HEAD | wpp/chat                | wpp.chat           | App\Http\Controllers\WppconnectController@chat                         | web                                         |
-|        |          |                         |                    |                                                                        | App\Http\Middleware\Authenticate            |
-|        | POST     | wpp/chatajax            | wpp.chatajax       | App\Http\Controllers\WppconnectController@getAllChatsAjax              | web                                         |
-|        |          |                         |                    |                                                                        | App\Http\Middleware\Authenticate            |
-|        | POST     | wpp/chatmsg             | wpp.chatmsg        | App\Http\Controllers\WppconnectController@getAllMessagesInChat         | web                                         |
-|        |          |                         |                    |                                                                        | App\Http\Middleware\Authenticate            |
-|        | GET|HEAD | wpp/contact             | wpp.contact        | App\Http\Controllers\WppconnectController@getAllContactsAjax           | web                                         |
-|        |          |                         |                    |                                                                        | App\Http\Middleware\Authenticate            |
-|        | GET|HEAD | wpp/contactpic/{userid} | wpp.contactpic     | App\Http\Controllers\WppconnectController@getProfileImgAjax            | web                                         |
-|        |          |                         |                    |                                                                        | App\Http\Middleware\Authenticate            |
-|        | POST     | wpp/earlierchatmsg      | wpp.earlierchatmsg | App\Http\Controllers\WppconnectController@getEarlierMessages           | web                                         |
-|        |          |                         |                    |                                                                        | App\Http\Middleware\Authenticate            |
-|        | POST     | wpp/getqrcode           | wpp.getqrcode      | App\Http\Controllers\WppconnectController@getQrCode                    | web                                         |
-|        |          |                         |                    |                                                                        | App\Http\Middleware\Authenticate            |
-|        | GET|HEAD | wpp/msg/{id}            | wpp.msg            | App\Http\Controllers\WppconnectController@getMessageById               | web                                         |
-|        |          |                         |                    |                                                                        | App\Http\Middleware\Authenticate            |
-|        | POST     | wpp/sendmsg             | wpp.sendmsg        | App\Http\Controllers\WppconnectController@sendCahtMessage              | web                                         |
-|        |          |                         |                    |                                                                        | App\Http\Middleware\Authenticate            |
-|        | POST     | wpp/setseen             | wpp.setseen        | App\Http\Controllers\WppconnectController@setSeenMessage               | web                                         |
-|        |          |                         |                    |                                                                        | App\Http\Middleware\Authenticate            |
-+--------+----------+-------------------------+--------------------+------------------------------------------------------------------------+---------------------------------------------+
++--------+----------+----------------------------------+-----------------------+------------------------------------------------------------------------+-----------------------------------------------------+
+| Domain | Method   | URI                              | Name                  | Action                                                                 | Middleware                                          |
++--------+----------+----------------------------------+-----------------------+------------------------------------------------------------------------+-----------------------------------------------------+
+|        | GET|HEAD | /                                |                       | App\Http\Controllers\HomeController@index                              | web                                                 |
+|        |          |                                  |                       |                                                                        | App\Http\Middleware\Authenticate                    |
+|        | GET|HEAD | api/user                         |                       | Closure                                                                | api                                                 |
+|        |          |                                  |                       |                                                                        | App\Http\Middleware\Authenticate:sanctum            |
+|        | PATCH    | filepond/api                     | filepond.chunk        | Sopamo\LaravelFilepond\Http\Controllers\FilepondController@chunk       | api                                                 |
+|        | POST     | filepond/api/process             | filepond.upload       | Sopamo\LaravelFilepond\Http\Controllers\FilepondController@upload      | api                                                 |
+|        | DELETE   | filepond/api/process             | filepond.delete       | Sopamo\LaravelFilepond\Http\Controllers\FilepondController@delete      | api                                                 |
+|        | GET|HEAD | home                             | home                  | App\Http\Controllers\HomeController@index                              | web                                                 |
+|        |          |                                  |                       |                                                                        | App\Http\Middleware\Authenticate                    |
+|        | GET|HEAD | livewire/livewire.js             |                       | Livewire\Controllers\LivewireJavaScriptAssets@source                   |                                                     |
+|        | GET|HEAD | livewire/livewire.js.map         |                       | Livewire\Controllers\LivewireJavaScriptAssets@maps                     |                                                     |
+|        | POST     | livewire/message/{name}          | livewire.message      | Livewire\Controllers\HttpConnectionHandler                             | web                                                 |
+|        | GET|HEAD | livewire/preview-file/{filename} | livewire.preview-file | Livewire\Controllers\FilePreviewHandler@handle                         | web                                                 |
+|        | POST     | livewire/upload-file             | livewire.upload-file  | Livewire\Controllers\FileUploadHandler@handle                          | web                                                 |
+|        |          |                                  |                       |                                                                        | Illuminate\Routing\Middleware\ThrottleRequests:60,1 |
+|        | GET|HEAD | login                            | login                 | App\Http\Controllers\Auth\LoginController@showLoginForm                | web                                                 |
+|        |          |                                  |                       |                                                                        | App\Http\Middleware\RedirectIfAuthenticated         |
+|        | POST     | login                            |                       | App\Http\Controllers\Auth\LoginController@login                        | web                                                 |
+|        |          |                                  |                       |                                                                        | App\Http\Middleware\RedirectIfAuthenticated         |
+|        | POST     | logout                           | logout                | App\Http\Controllers\Auth\LoginController@logout                       | web                                                 |
+|        | GET|HEAD | password/confirm                 | password.confirm      | App\Http\Controllers\Auth\ConfirmPasswordController@showConfirmForm    | web                                                 |
+|        |          |                                  |                       |                                                                        | App\Http\Middleware\Authenticate                    |
+|        | POST     | password/confirm                 |                       | App\Http\Controllers\Auth\ConfirmPasswordController@confirm            | web                                                 |
+|        |          |                                  |                       |                                                                        | App\Http\Middleware\Authenticate                    |
+|        | POST     | password/email                   | password.email        | App\Http\Controllers\Auth\ForgotPasswordController@sendResetLinkEmail  | web                                                 |
+|        | GET|HEAD | password/reset                   | password.request      | App\Http\Controllers\Auth\ForgotPasswordController@showLinkRequestForm | web                                                 |
+|        | POST     | password/reset                   | password.update       | App\Http\Controllers\Auth\ResetPasswordController@reset                | web                                                 |
+|        | GET|HEAD | password/reset/{token}           | password.reset        | App\Http\Controllers\Auth\ResetPasswordController@showResetForm        | web                                                 |
+|        | GET|HEAD | register                         | register              | App\Http\Controllers\Auth\RegisterController@showRegistrationForm      | web                                                 |
+|        |          |                                  |                       |                                                                        | App\Http\Middleware\RedirectIfAuthenticated         |
+|        | POST     | register                         |                       | App\Http\Controllers\Auth\RegisterController@register                  | web                                                 |
+|        |          |                                  |                       |                                                                        | App\Http\Middleware\RedirectIfAuthenticated         |
+|        | GET|HEAD | sanctum/csrf-cookie              |                       | Laravel\Sanctum\Http\Controllers\CsrfCookieController@show             | web                                                 |
+|        | GET|HEAD | wpp                              | wpp.index             | App\Http\Controllers\WppconnectController@index                        | web                                                 |
+|        |          |                                  |                       |                                                                        | App\Http\Middleware\Authenticate                    |
+|        | GET|HEAD | wpp/chat                         | wpp.chat              | App\Http\Controllers\WppconnectController@chat                         | web                                                 |
+|        |          |                                  |                       |                                                                        | App\Http\Middleware\Authenticate                    |
+|        | POST     | wpp/chatmsg                      | wpp.chatmsg           | App\Http\Controllers\WppconnectController@getAllMessagesInChat         | web                                                 |
+|        |          |                                  |                       |                                                                        | App\Http\Middleware\Authenticate                    |
+|        | GET|HEAD | wpp/contact                      | wpp.contact           | App\Http\Controllers\WppconnectController@getAllContactsAjax           | web                                                 |
+|        |          |                                  |                       |                                                                        | App\Http\Middleware\Authenticate                    |
+|        | GET|HEAD | wpp/contactpic/{userid}          | wpp.contactpic        | App\Http\Controllers\WppconnectController@getProfileImgAjax            | web                                                 |
+|        |          |                                  |                       |                                                                        | App\Http\Middleware\Authenticate                    |
+|        | POST     | wpp/forwordmsg                   | wpp.forwordmsg        | App\Http\Controllers\WppconnectController@forwordMessage               | web                                                 |
+|        |          |                                  |                       |                                                                        | App\Http\Middleware\Authenticate                    |
+|        | POST     | wpp/getqrcode                    | wpp.getqrcode         | App\Http\Controllers\WppconnectController@getQrCode                    | web                                                 |
+|        |          |                                  |                       |                                                                        | App\Http\Middleware\Authenticate                    |
+|        | GET|HEAD | wpp/msg/{id}                     | wpp.msg               | App\Http\Controllers\WppconnectController@messageById                  | web                                                 |
+|        |          |                                  |                       |                                                                        | App\Http\Middleware\Authenticate                    |
+|        | POST     | wpp/sendfile                     | wpp.sendfile          | App\Http\Controllers\WppconnectController@sendFile                     | web                                                 |
+|        |          |                                  |                       |                                                                        | App\Http\Middleware\Authenticate                    |
+|        | POST     | wpp/sendmsg                      | wpp.sendmsg           | App\Http\Controllers\WppconnectController@sendMessage                  | web                                                 |
+|        |          |                                  |                       |                                                                        | App\Http\Middleware\Authenticate                    |
++--------+----------+----------------------------------+-----------------------+------------------------------------------------------------------------+-----------------------------------------------------+

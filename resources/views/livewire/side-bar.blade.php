@@ -161,8 +161,12 @@
                                         <div role="gridcell" aria-colindex="2"
                                             class="users-group-name-time-grid">
                                             <div class="users-group-name-content">
-                                                <span dir="auto" id="user_name_{{$chat['id']['user']}}" title="{{$chat['contact']['formattedName']}}"
-                                                    class="user-name-txt">{{$chat['contact']['formattedName']}}
+                                                <span dir="auto" id="user_name_{{$chat['id']['user']}}" title="{{$chat['contact']['formattedName']}}" class="user-name-txt">
+                                                    @if($chat['isGroup'])
+                                                        {{ $chat['name']??$chat['contact']['formattedName'] }}
+                                                    @else
+                                                        {{ $chat['contact']['formattedName']}}
+                                                    @endif
                                                 </span>
                                             </div>
                                             <div class="users-group-counter-content"><!--yesterday--></div>

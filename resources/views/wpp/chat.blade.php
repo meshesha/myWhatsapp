@@ -100,7 +100,7 @@
 	z-index: 100;
 	height: 49px;
 } */
-/* 
+
 
 .swal2-actions .textbox-input {
 	position: relative;
@@ -115,7 +115,7 @@
 	-moz-user-select: text;
 	-ms-user-select: text;
 	user-select: text;
-} */
+}
     </style>
 @endsection
 
@@ -138,22 +138,33 @@
         var pond = null;
         FilePond.registerPlugin(FilePondPluginImagePreview);
         FilePond.registerPlugin(FilePondPluginMediaPreview);
+        // FilePond.setOptions({
+        //     server: {
+        //         url: '/filepond/api',
+        //         process: '/process',
+        //         //revert: '/process',
+        //         //patch: "?patch=",
+        //         headers: {
+        //         'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        //         }
+        //     }
+        // });
         FilePond.setOptions({
             server: {
-                url: '/filepond/api',
-                process: '/process',
-                revert: '/process',
-                patch: "?patch=",
+                url: '/pond/upload',
                 headers: {
                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 }
             }
         });
+
+
+        
         //FilePond.registerPlugin(FilePondPluginImageCrop);
 
         const Toast = Swal.mixin({
             toast: true,
-            position: 'center-center',
+            position: 'center',
             showConfirmButton: false,
             timer: 3000,
             timerProgressBar: true,
@@ -220,7 +231,7 @@
                     let chat_msg_id = chatItem.data("id");
                     let chat_msg_serializedid = chatItem.data("serializedid");
 
-                    console.log(m, chat_msg_id, chat_msg_serializedid);
+                    // console.log(m, chat_msg_id, chat_msg_serializedid);
                     if (key == "replay") {
                         //console.log(chatItem );
                         chat_replat_msg_serializedid = chat_msg_serializedid;
@@ -341,9 +352,8 @@
                             // inputValidator: (result) => {
                             //     console.log("upload-img-preview: ", result)
                             // },
-                            html: '<div class="upload-img-preview" ><input type="file" class="pond-file" /></div>',
+                            html: '<div class="upload-img-preview" ><input type="file" name="pond-file" class="pond-file" /></div>',
                             //html: '<div class="upload-img-preview" ></div>',
-                            //footer: "<h3>Test</h3>",
                             didRender: () => {
 
                                 // Create a FilePond instance
@@ -352,24 +362,65 @@
                                     allowProcess: false
                                 });
 
-                                //$(".swal2-actions").append("<input type='text' class='textbox-input' id='imge_msg_text_msg' />");
-                                //$('.pond-file').filepond();
+                                $(".swal2-actions").append("<input type='text' class='textbox-input' id='imge_msg_text_msg' />");
                             },
                             preConfirm: () => {
-                                
-                                pond.processFiles().then((files) => {
-                                    // files have been processed
-                                    console.log("pond.processFiles:", files)
+                                pond.prepareFiles().then((files) => {
+                                    console.log("pond.prepareFiles:", files);
                                     if(files.length > 0){
-                                        Swal.close();
-                                        Toast.fire({
-                                            icon: 'success',
-                                            title: 'uploaded in successfully'                 
-                                        })
+                                        var filename = files[0].filename;
+                                        var fileSize = files[0].fileSize;
+                                        var fileType = files[0].fileType;
+                                        var fileExtension = files[0].fileExtension;
+                                        //if(fileType == .. && fileSize == ...){
+                                        //    TODO
+                                        //}
 
-                                        return true;
+                                        pond.processFiles().then((files) => {
+                                            // files have been processed
+                                            console.log("pond.processFiles:", files)
+                                            if(files.length > 0){
+                                                // var filename = files[0].filename;
+                                                // var fileSize = files[0].fileSize;
+                                                // var fileType = files[0].fileType;
+                                                // var fileExtension = files[0].fileExtension;
+                                                var texMsg = $("#imge_msg_text_msg").val()
+                                                var serverId = files[0].serverId;
+                                                var file_name = files[0].filename;
+                                                var user_id = $("#slected_current_user_id").val();
+                                                var isGroup = $("#slected_current_is_group").val();
+                                                //Swal.close();
+                                                sendBase64File(texMsg, serverId, file_name , user_id , isGroup, function(response){
+                                                    console.log("sendBase64File: ",response )
+                                                    if(response.response.status == "success"){
+
+                                                        Toast.fire({
+                                                            icon: 'success',
+                                                            title: 'uploaded in successfully'                 
+                                                        });
+                                                    }
+                                                    return false;
+                                                })
+
+                                                return false;
+
+                                            }
+                                            return false;
+                                        });
+
+                                        // Swal.close();
+                                        // Toast.fire({
+                                        //     icon: 'success',
+                                        //     title: 'uploaded in successfully'                 
+                                        // })
 
                                     }
+
+                                    // Toast.fire({
+                                    //     icon: 'error',
+                                    //     title: 'לא נבחר קובץ',
+                                    // });
+                                    return false;
                                 });
                                 
                                  return false; // Prevent confirmed
@@ -622,6 +673,43 @@
                 }
             });
         }
+
+
+        function sendBase64File(msg , serverId , file_name, user_id , isGroup, callback){
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+
+            $.ajax({
+                type: 'POST',
+                data: {
+                    msg_body : msg,
+                    serverId: serverId,
+                    fileName: file_name,
+                    send_to: user_id,
+                    is_group: isGroup
+                },
+                url: '/wpp/sendfile',
+                success: function(data) {
+                    callback(data);
+                },
+                error: function(response){
+                    var obj = {
+                        response: {
+                            status: "error",
+                            data: response
+                        }
+                    }
+                    callback(obj);
+                }
+            });
+        }
+
+
+
+
 
         function createContentHtml(users_contants, showCheckBox) {
             if (users_contants === undefined) {
@@ -1147,7 +1235,7 @@
                 },
                 error: function(response) {
                     //show error - TODO
-                    console.log("getImgAjax (ajax error):", serialize_id, response.responseText);
+                    console.log("getImgAjax (ajax error):", serialize_id, response);
                 }
             });
         }

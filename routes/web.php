@@ -30,11 +30,18 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 //Route::resource('wpp', App\Http\Controllers\WppconnectController::class);
 Route::get('wpp', [App\Http\Controllers\WppconnectController::class, 'index'])->name('wpp.index');
 Route::post('wpp/getqrcode', [App\Http\Controllers\WppconnectController::class, 'getQrCode'])->name('wpp.getqrcode');
+
+Route::get('wpp/getallsession', [App\Http\Controllers\WppconnectController::class, 'getAllSession'])->name('wpp.getallsession');
+Route::get('wpp/startallsession', [App\Http\Controllers\WppconnectController::class, 'startAllSession'])->name('wpp.startallsession');
+Route::get('wpp/startsession/{session}', [App\Http\Controllers\WppconnectController::class, 'startSession'])->name('wpp.startsession');
+Route::get('wpp/closesession/{session}', [App\Http\Controllers\WppconnectController::class, 'closeSession'])->name('wpp.closesession');
+
 Route::get('wpp/chat', [App\Http\Controllers\WppconnectController::class, 'chat'])->name('wpp.chat');
 //Route::post('wpp/chatajax', [App\Http\Controllers\WppconnectController::class, 'getAllChatsAjax'])->name('wpp.chatajax');
 Route::post('wpp/chatmsg', [App\Http\Controllers\WppconnectController::class, 'getAllMessagesInChat'])->name('wpp.chatmsg');
 //Route::post('wpp/earlierchatmsg', [App\Http\Controllers\WppconnectController::class, 'earlierMessages'])->name('wpp.earlierchatmsg');
 Route::post('wpp/sendmsg', [App\Http\Controllers\WppconnectController::class, 'sendMessage'])->name('wpp.sendmsg');
+Route::post('wpp/sendfile', [App\Http\Controllers\WppconnectController::class, 'sendFile'])->name('wpp.sendfile');
 Route::post('wpp/forwordmsg', [App\Http\Controllers\WppconnectController::class, 'forwordMessage'])->name('wpp.forwordmsg');
 Route::get('wpp/msg/{id}', [App\Http\Controllers\WppconnectController::class, 'messageById'])->name('wpp.msg');
 
@@ -42,3 +49,5 @@ Route::get('wpp/msg/{id}', [App\Http\Controllers\WppconnectController::class, 'm
 
 Route::get('wpp/contact', [App\Http\Controllers\WppconnectController::class, 'getAllContactsAjax'])->name('wpp.contact');
 Route::get('wpp/contactpic/{userid}', [App\Http\Controllers\WppconnectController::class, 'getProfileImgAjax'])->name('wpp.contactpic');
+
+Route::post('pond/upload', [App\Http\Controllers\FilePond::class, 'store'])->name('pond.upload');

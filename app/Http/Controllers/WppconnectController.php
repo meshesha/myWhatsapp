@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Http\lib\Wpp;
+use Storage;
 //use Wppconnect;
 //use Session;
 
@@ -62,7 +63,7 @@ class WppconnectController extends Controller
         $conn_status = "";
         $qrcodehash = "";
         if(session('token') && session('session') && session('init')){
-            $response = Wpp::startWppSession();
+            $response = Wpp::startSession(session('session'), session('token'));//Wpp::startWppSession();
             $conn_status = Wpp::checkWppSessionStatus();
         }
         
@@ -77,6 +78,135 @@ class WppconnectController extends Controller
         ), 200);
         //return json_encode($response);
     }
+
+
+
+    /**
+     * Show all sessions.
+     * 
+     */
+    public function getAllSession()
+    {
+        $response = "";
+        if($this->key != ""){
+            $response = Wpp::getAllSession($this->key);
+        }
+        $good_sessions = array();
+        $all_sessions = array();
+        
+        if($response != "" && $response != null && count($response) > 0){
+            if(isset($response["response"]) && count($response["response"]) > 0){
+                foreach($response["response"] as $session){
+                    $sstt = "";
+                    try{
+                        $sstt = Wpp::checkWppSessionStatus($session["session"]);
+                        //dump($sstt);
+                        //$token = session('token');
+                        //dump($token);
+                    }catch(Exception $e){
+                        
+                    }
+                    //$stt_ary = array();
+                    $sstt["session"] =  $session["session"];
+                    
+                    $all_sessions[] = $sstt;
+
+                    if($sstt != "" && $sstt != null){
+                        if(!isset($sstt["error"])){
+                            $good_sessions[] = $sstt;
+                        }else{
+                            //kill sestion
+                        }
+                    }
+                    //dump($sstt);
+                } 
+            }
+        }
+        dd($all_sessions);
+        if(count($good_sessions) > 0){
+            $sstt = "";
+            // try{
+            //     $sstt = Wpp::startAllSession($session["session"]);
+            // }catch(Exception $e){
+                
+            // }
+            // dump($sstt);
+            
+            foreach($good_sessions as $session){
+                if($session["status"] == false){
+                    //reconnect $session["session"]
+                    try{
+                        $sstt = Wpp::startSession($session["session"]);
+                    }catch(Exception $e){
+                        
+                    }
+                }
+            }
+        }
+        dd($sstt);
+
+        $chats_md5 = md5(json_encode($response));
+
+        return response()->json(array(
+            'response'=> $response,
+        ), 200);
+    }
+
+
+    /**
+     * Start all sessions.
+     * 
+     */
+    public function startAllSession()
+    {
+        $response = "";
+        if($this->key != ""){
+            $response = Wpp::startAllSession($this->key);
+        }
+        dd($response);
+
+        return response()->json(array(
+            'response'=> $response,
+        ), 200);
+    }
+
+
+    /**
+     * close all sessions.
+     * 
+     */
+    public function startSession($session_id)
+    {
+        $response = "";
+        if($this->key != ""){
+            $response = Wpp::startSession($session_id);
+        }
+        dd($response);
+
+        return response()->json(array(
+            'response'=> $response,
+        ), 200);
+    }
+
+    /**
+     * close all sessions.
+     * 
+     */
+    public function closeSession($session_id)
+    {
+        $response = "";
+        if($this->key != ""){
+            $response = Wpp::closeSession($session_id);
+        }
+        dd($response);
+
+        return response()->json(array(
+            'response'=> $response,
+        ), 200);
+    }
+
+
+
 
 
     /**
@@ -306,6 +436,58 @@ class WppconnectController extends Controller
 
     }
 
+    /**
+     * Show the qr code for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */ 
+    public function sendFile(Request $request)
+    {
+        
+        
+        $send_to = $request->input('send_to');
+        $isgroup = ($request->input('is_group') == "yes")?true:false;
+        $msg_body = $request->input('msg_body');
+
+        $serverId = $request->input('serverId');
+        $fileName = $request->input('fileName');
+        
+        // $msg_body = str_replace("<div>", "" , $msg_body);
+        // $msg_body = str_replace("</div>", "\r\n" , $msg_body);
+        // $msg_body = trim(strip_tags($msg_body));
+
+        // $filepond = app(\Sopamo\LaravelFilepond\Filepond::class);
+        // $disk = config('filepond.temporary_files_disk');
+
+        // $path = $filepond->getPathFromServerId($serverId);
+        // $fullpath = Storage::disk($disk)->get($path);
+        // $finalLocation = public_path('output.jpg');
+        // \File::move($fullpath, $finalLocation);
+
+        $finalLocation = public_path('storage/images/'.$serverId);
+        $file_content = file_get_contents($finalLocation);
+        $base64 = base64_encode($file_content);
+        $mime_type = mime_content_type($finalLocation);
+        $fullBase64 = 'data:' . $mime_type . ';base64,' . $base64;
+        //dd($fullBase64);
+
+
+        $user_id = str_replace(array("@c.us","@g.us"), array("",""), $send_to);
+
+        $response = Wpp::SendBase64File($user_id , $fullBase64 ,$fileName, $msg_body , $isgroup);
+
+        if($response["status"] == "success"){
+            //delete file
+              if(\File::exists($finalLocation)){
+                \File::delete($finalLocation);
+            }
+        }
+
+        return response()->json(array(
+            'response'=> $response
+        ), 200);
+
+    }
 
     /**
      * Show the qr code for creating a new resource.

@@ -51,7 +51,8 @@
     <link href="https://unpkg.com/filepond@^4/dist/filepond.css" rel="stylesheet" />
 
     <!-- include FilePond plugins -->
-    <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css" rel="stylesheet"/>
+    {{-- <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css" rel="stylesheet"/> --}}
+    <link href="{{ url('filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css') }}" rel="stylesheet">
     <link href="{{ url('filepond-plugin-media-preview/filepond-plugin-media-preview.css') }}" rel="stylesheet">
 
 
@@ -214,7 +215,8 @@
     
     <!-- include FilePond library -->
     
-    <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.js"></script>
+    {{-- <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.js"></script> --}}
+    <script src="{{ url('filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.js') }}"></script>
     {{-- <script src="https://unpkg.com/filepond-plugin-image-crop/dist/filepond-plugin-image-crop.js"></script> --}}
     <script src="{{ url('filepond-plugin-media-preview/filepond-plugin-media-preview.js') }}"></script>
     <script src="https://unpkg.com/filepond/dist/filepond.min.js"></script>

@@ -25,12 +25,21 @@ class SideBar extends Component
         if($all_chats != "" && $all_chats['status'] == 'success'){
             $chatsArr = $all_chats['response'];
         }
+
+        // dd($chatsArr);
+
         if($this->searchUser != null){
             //dd($chatsArr);
             $search = $this->searchUser;
             
             $chatsArr = array_filter($chatsArr, function($item) use($search){
-                if(strpos($item["contact"]["formattedName"],$search) !== false){
+                $serchIn = "";
+                if($item['isGroup']){
+                    $serchIn = $item["name"]??$item["contact"]["formattedName"];
+                }else{
+                    $serchIn = $item["contact"]["formattedName"];
+                }
+                if(strpos($serchIn,$search) !== false){
                     return true;
                 }
                 return false;
@@ -91,7 +100,9 @@ class SideBar extends Component
         if($myContant != ""){
             //$myContantData = Wpp::getContact($myContant["id"]["user"]);
             $profileImg = Wpp::getProfileImg($myContant["id"]["user"]);
+            
             if($profileImg != "" && $profileImg['status'] == 'success'){
+                // dump($profileImg["response"]["eurl"]);
                 $myProfileImg = $profileImg["response"]["eurl"];
             }
             $this->myProfileImg = $myProfileImg;
