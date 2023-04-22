@@ -14,7 +14,18 @@
                         </div>
                     @endif
 
-                    {{ __('You are logged in!') }}
+
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <td>Chat</td>
+                                <td>
+                                    <a href="{{route('wpp.chat')}}" class="btn btn-primary">Open</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
                 </div>
             </div>
         </div>

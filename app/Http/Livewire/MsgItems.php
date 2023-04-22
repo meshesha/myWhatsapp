@@ -41,8 +41,13 @@ class MsgItems extends Component
         
         $phon_num = str_replace(array("@c.us","@g.us"), array("",""), $userId);
         
-        $response = Wpp::getChatById($phon_num, $isgroup);
-       
+        // $response = Wpp::getChatById($phon_num, $isgroup);
+        // $this->chats_md5 = md5(json_encode($response));
+        
+        
+        $response = $this->earlierMessages($userId, $is_group, "");
+        
+        // dd($response);
         $this->chats_md5 = md5(json_encode($response));
 
         // dd($response);
@@ -56,6 +61,20 @@ class MsgItems extends Component
                 //     $last_msg_id = $last_msg_id_ary[2];
                 // }
             }
+
+            foreach($response["response"] as &$msg){
+                if($msg["hasReaction"]){
+                    //get Reaction
+                    $msg_id = $msg["id"];
+                    $reaction = $this->getReaction($msg_id);
+                    if($reaction && $reaction["status"] == "success"){
+                        // dump($reaction["response"]["response"]["reactions"]);
+                        $msg["reactions"] = $reaction["response"]["response"]["reactions"];
+                    }
+                }
+            }
+
+
             $this->msg_items = $response["response"];
         }
 
@@ -83,33 +102,43 @@ class MsgItems extends Component
         }
     }
 
+    public function getReaction($msg_id)
+    {
+        try{
+            $response = Wpp::getReaction($msg_id);
 
-    // public function inint()
-    // {
-    //     if(!session('token') && !session('session')){
-    //         return redirect()->route('wpp.index');//return $this->index();
-    //     }
-    //     $conn_status = Wpp::checkWppSessionStatus();
-        
-    //     if($conn_status['status'] != true){
-    //         //return redirect()->route("home");
-    //         session([
-    //             'init' => false,
-    //             'session' => '',
-    //             'token' => ''
-    //         ]);
+            return array(
+                'response'=> $response,
+                'status' => ($response != "" && $response["status"])?$response["status"]:"fail"
+            );
+        }catch(Exception $e){
 
-    //         return redirect()->route('wpp.index');//$this->index();
-    //     }
-    //     //dd($conn_status);
-    //     session(['init' => true]);
-        
-    //     $this->getAllChatsUsers();
-       
-    //     $this->getContants();
-    //     $this->getMyProfile();
-    // }
+            return array(
+                'response'=> $e,
+                'status' => 'fail'
+            );
 
+        }
+    }
+
+    public function getVotes($msg_id)
+    {
+        try{
+            $response = Wpp::getVotes($msg_id);
+
+            return array(
+                'response'=> $response,
+                'status' => ($response != "" && $response["status"])?$response["status"]:"fail"
+            );
+        }catch(Exception $e){
+
+            return array(
+                'response'=> $e,
+                'status' => 'fail'
+            );
+
+        }
+    }
 
 
     public function earlierMessages($userId, $is_group, $last_msg_id)
@@ -117,25 +146,12 @@ class MsgItems extends Component
         //userId => userSrializeId, 
         //?isGroup=false&includeMe=true&includeNotifications=false
         $isgroup = ($is_group == 'yes')?'true':'false';
+        $response = "";
         try{
             $response = Wpp::getEarlierMessages($userId, $isgroup, $last_msg_id);
-            
-            $chats_md5 = md5(json_encode($response));
-
-            return array(
-                'response'=> $response,
-                'status' => ($response != "" && $response["status"])?$response["status"]:"fail",
-                'chats_md5' => $chats_md5
-            );
         }catch(Exception $e){
-
-            return array(
-                'response'=> $e,
-                'status' => 'fail',
-                'chats_md5' => '-1'
-            );
-
         }
+        return $response;
     }
 
     public function setSeenMessage($userId)
@@ -162,7 +178,8 @@ class MsgItems extends Component
         
         $phon_num = str_replace(array("@c.us","@g.us"), array("",""), $currentUserId);
         
-        $response = Wpp::getChatById($phon_num, $isgroup);
+        // $response = Wpp::getChatById($phon_num, $isgroup);
+        $response = $this->earlierMessages($currentUserId, $isgroup, "");
        
         $new_chats_md5 = md5(json_encode($response));
 

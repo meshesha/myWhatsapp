@@ -232,42 +232,8 @@ class WppconnectController extends Controller
         }
         //dd($conn_status);
         session(['init' => true]);
-        // $all_chats = Wpp::getAllChats();
-        // //dd($all_chats);
-        // $chatsArr = [];
-        // if($all_chats != "" && $all_chats['status'] == 'success'){
-        //     $chatsArr = $all_chats['response'];
-        // }
         
-        // $all_contacts = Wpp::getAllContacts();
-        // $contantsArr = [];
-        // $myContant = "";
-        // $myProfileImg = "";
-        // if($all_contacts != "" && $all_contacts['status'] == 'success'){
-        //     foreach ($all_contacts["response"] as $contact) {
-        //         if (!$contact["isMe"] && $contact["isMyContact"] && $contact["id"]["user"] != null )
-        //             $contantsArr[] = $contact;
-        //         elseif($contact["isMe"])
-        //             $myContant = $contact;
-        //     }
-        // }
-        // if($myContant != ""){
-        //     //$myContantData = Wpp::getContact($myContant["id"]["user"]);
-        //     $profileImg = Wpp::getProfileImg($myContant["id"]["user"]);
-        //     if($profileImg != "" && $profileImg['status'] == 'success'){
-        //         $myProfileImg = $profileImg["response"]["eurl"];
-        //     }
-        //     //dd($myProfileImg);
-        // }
-
-        // $chats_md5 = md5(json_encode($all_chats));
-        // $data = array(
-        //     'title' => 'All Chats',
-        //     'allChats' => $chatsArr,
-        //     'chats_md5' => $chats_md5,
-        //     'myProfileImg' =>$myProfileImg
-        // );
-        //get all sers/group list - TODO;;
+        
         return view('wpp.chat');//->with($data);
     }
 
@@ -303,31 +269,6 @@ class WppconnectController extends Controller
      * Show the qr code for creating a new resource.
      *
      * @return \Illuminate\Http\Response
-     */
-    // public function getAllChatsAjax()
-    // {
-    //     $response = "";
-    //     $conn_status = "";
-    //     if(session('token') && session('session') && session('init')){
-    //         $response = Wpp::getAllChats();
-    //         $conn_status = Wpp::checkWppSessionStatus();
-    //     }
-        
-    //     $chats_md5 = md5(json_encode($response));
-
-    //     return response()->json(array(
-    //         'response'=> $response,
-    //         'conn_status' => $conn_status,
-    //         'chats_md5' => $chats_md5
-    //     ), 200);
-    //     //return json_encode($response);
-    // }
-
-
-    /**
-     * Show the qr code for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
      */ 
     public function getAllMessagesInChat(Request $request)
     {
@@ -341,7 +282,8 @@ class WppconnectController extends Controller
         
         $phon_num = str_replace(array("@c.us","@g.us"), array("",""), $userId);
         
-        $response = Wpp::getChatById($phon_num, $isgroup);
+        // $response = Wpp::getChatById($phon_num, $isgroup);
+        $response = $this->earlierMessages($userId, $isgroup, "");
         
         $chats_md5 = md5(json_encode($response));
 
@@ -358,23 +300,18 @@ class WppconnectController extends Controller
      *
      * @return \Illuminate\Http\Response
      */ 
-    // public function earlierMessages(Request $request)
-    // {
-        
-    //     //?isGroup=false&includeMe=true&includeNotifications=false
-    //     $userId = $request->input('user_id');
-    //     $isgroup = ($request->input('is_group') == 'yes')?'true':'false';
-        
-    //     $response = Wpp::getEarlierMessages($userId, $isgroup);
-        
-    //     $chats_md5 = md5(json_encode($response));
-
-    //     return response()->json(array(
-    //         'response'=> $response,
-    //         'status' => ($response != "" && $response["status"])?$response["status"]:"fail",
-    //         'chats_md5' => $chats_md5
-    //     ), 200);
-    // }
+    public function earlierMessages($userId, $is_group, $last_msg_id)
+    {
+        //userId => userSrializeId, 
+        //?isGroup=false&includeMe=true&includeNotifications=false
+        $isgroup = ($is_group == 'yes')?'true':'false';
+        $response = "";
+        try{
+            $response = Wpp::getEarlierMessages($userId, $isgroup, $last_msg_id);
+        }catch(Exception $e){
+        }
+        return $response;
+    }
 
     /**
      * Show the qr code for creating a new resource.

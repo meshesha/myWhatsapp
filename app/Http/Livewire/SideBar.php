@@ -103,7 +103,9 @@ class SideBar extends Component
             
             if($profileImg != "" && $profileImg['status'] == 'success'){
                 // dump($profileImg["response"]["eurl"]);
-                $myProfileImg = $profileImg["response"]["eurl"];
+                if(isset($profileImg["response"]["eurl"])){
+                    $myProfileImg = $profileImg["response"]["eurl"];
+                }
             }
             $this->myProfileImg = $myProfileImg;
             if($myProfileImg != ""){

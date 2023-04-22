@@ -277,9 +277,11 @@
             var side_main_menu = `<div>
                 <a href="#" id="file"><i id="file" class="far fa-file"></i></a>
                 <a href="#" id="user-card"><i class="far fa-id-card"></i></a>
-                <a href="{{ route('logout') }}" 
+                <!--<a href="{{ route('logout') }}" 
                     onclick="event.preventDefault();document.getElementById('logout-form').submit();" 
                     id="logout"><i class="fas fa-sign-out-alt"></i>
+                </a>-->
+                <a href="{{ route('home') }}" id="go-home"><i class="fas fa-sign-out-alt"></i>
                 </a>
             </div>`;
 
@@ -295,6 +297,9 @@
                 popItemClick: function(e) {
                     let menu_type = $(this).attr("id");
                     console.log("menu", menu_type);
+                    if(menu_type == "go-home"){
+                        location.href = $(this).attr("href");
+                    }
                 }
             });
 

@@ -51,8 +51,11 @@ class Wpp //extends Component
                 $user->wpp_session = $response['session'];
                 $user->save();
 
-                $sessiontoken = new SessionTokens;
-                $sessiontoken->user_id = $user->id;
+                $sessiontoken = SessionTokens::where("user_id", $user->id)->first();
+                if($sessiontoken == null){
+                    $sessiontoken = new SessionTokens;
+                    $sessiontoken->user_id = $user->id;
+                }
                 $sessiontoken->session = $response['session'];
                 $sessiontoken->token = $response['token'];
                 $sessiontoken->save();
@@ -246,6 +249,7 @@ class Wpp //extends Component
         return $response;
     }
 
+
     static public function getEarlierMessages($userId, $isgroup, $last_msg_id)
     {
 
@@ -275,6 +279,64 @@ class Wpp //extends Component
         if($response != "" && $response != null){
             $response = json_decode($response->getBody()->getContents(),true);
         }
+        return $response;
+    }
+
+    static public function getReaction($msg_id)
+    {
+
+        $response = "";
+        $session = session('session');
+        $token = session('token');
+        
+        $to = "/api/$session/reactions/$msg_id";
+        
+
+        if($token && $session && session('init')){
+            Wppconnect::make(Wpp::$url , false);
+            try{
+                $response = Wppconnect::to($to)->withHeaders([
+                    'Authorization' => 'Bearer '.$token 
+                ])->asJson()->get();    
+            }catch(Exception $e){
+
+            }
+
+            //$response = json_decode($response->getBody()->getContents(),true);
+        }
+        if($response != "" && $response != null){
+            $response = json_decode($response->getBody()->getContents(),true);
+        }
+
+        return $response;
+    }
+
+    static public function getVotes($msg_id)
+    {
+
+        $response = "";
+        $session = session('session');
+        $token = session('token');
+        
+        $to = "/api/$session/votes/$msg_id";
+        
+
+        if($token && $session && session('init')){
+            Wppconnect::make(Wpp::$url , false);
+            try{
+                $response = Wppconnect::to($to)->withHeaders([
+                    'Authorization' => 'Bearer '.$token 
+                ])->asJson()->get();    
+            }catch(Exception $e){
+
+            }
+
+            //$response = json_decode($response->getBody()->getContents(),true);
+        }
+        if($response != "" && $response != null){
+            $response = json_decode($response->getBody()->getContents(),true);
+        }
+
         return $response;
     }
 

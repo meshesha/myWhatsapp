@@ -34,8 +34,8 @@ class HomeController extends Controller
         session(['token' => $user_token]);
         session(['session' => $user_session]);
 
-        //return view('home');
-        return redirect()->route('wpp.chat');
+        return view('home');
+        // return redirect()->route('wpp.chat');
         //return view('wpp.contact');
     }
 }

@@ -233,13 +233,19 @@
                                             </div>
                                         </div> --}}
                                     </div>
-                                    <div class="vcard-msg-action-cnt">
+                                    {{-- <div class="vcard-msg-action-cnt">
                                         <div class="vcard-msg-action-cols " role="button" tabindex="0"
                                             title="הודעה אל רונן חזן-תקשוב">הודעה</div>
                                         <div class="vcard-msg-action-cols " role="button" tabindex="0"
                                             title="לצרף לקבוצה">לצרף
                                             לקבוצה</div>
-                                    </div>
+                                    </div> --}}
+                                @else
+                                    {{-- if ($msg['type'] != 'chat') --}}
+                                        <script>
+                                            console.log("TODO type:", "{{$msg['type']}}", {!! json_encode($msg) !!});
+                                        </script>
+                                    {{-- endif --}}
                                 @endif
                                 @if ($msg['type'] != 'vcard')
                                     <div class="msg-text-content">
@@ -356,7 +362,7 @@
                     block: "end"
                 });
                 $("body").removeClass("loading");
-            }, 500);
+            }, 1000);
         }
 
         function setChatTimer(userSrializeId, isGroup) {
